@@ -150,13 +150,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AnalysisTable.h" />
+    <ClInclude Include="GrammerAnalysis.h" />
     <ClInclude Include="headerInclude.h" />
     <ClInclude Include="LexAnalyse.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TokenList.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnalysisTable.cpp" />
     <ClCompile Include="compiler.cpp" />
+    <ClCompile Include="GrammerAnalysis.cpp" />
     <ClCompile Include="LexAnalyse.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

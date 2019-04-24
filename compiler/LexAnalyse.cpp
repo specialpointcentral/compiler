@@ -4,7 +4,7 @@
 LexAnalyse::LexAnalyse(std::vector<std::string> inputLex)
 {
 	this->inputLex = inputLex;
-	this->tokenLists = TokenList();
+	this->tokenList = nullptr;
 }
 
 LexAnalyse::~LexAnalyse()
@@ -27,13 +27,13 @@ bool LexAnalyse::lexAnalysic()
 				// 判断是不是keyword
 				if (isKeyword(hintLine.substr(lastPos, pos - lastPos + 1))) {
 					// TODO 加入keyword
-					std::cout << "keyword\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
-					tokenLists.Toke(KEYWORDS, hintLine.substr(lastPos, pos - lastPos + 1));
+					// std::cout << "keyword\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
+					tokenList->Toke(KEYWORDS, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
 				else {
 					// TODO 加入id
-					std::cout << "id\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
-					tokenLists.Toke(ID, hintLine.substr(lastPos, pos - lastPos + 1));
+					// std::cout << "id\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
+					tokenList->Toke(ID, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
 
 			}
@@ -55,22 +55,22 @@ bool LexAnalyse::lexAnalysic()
 				else {
 					// int10
 					// TODO 加入int10
-					std::cout << "int10\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
-					tokenLists.Toke(INT10, hintLine.substr(lastPos, pos - lastPos + 1));
+					// std::cout << "int10\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
+					tokenList->Toke(INT10, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
 			}
 			else if (isOp(hintLine[pos])) {
 				// 对于是op的，考虑 1-only,2-double
 				if (isOp(hintLine.substr(lastPos, 2))) {
 					// TODO 加入两个的 hintLine.substr(lastPos, 2)
-					std::cout << "op\t" << hintLine.substr(lastPos, 2) << std::endl;
-					tokenLists.Toke(OP, hintLine.substr(lastPos, 2));
+					// std::cout << "op\t" << hintLine.substr(lastPos, 2) << std::endl;
+					tokenList->Toke(OP, hintLine.substr(lastPos, 2));
 					++pos;
 				}
 				else {
 					// TODO 加入一个的
-					std::cout << "op\t" << hintLine.substr(lastPos, 1) << std::endl;
-					tokenLists.Toke(OP, hintLine.substr(lastPos, 1));
+					// std::cout << "op\t" << hintLine.substr(lastPos, 1) << std::endl;
+					tokenList->Toke(OP, hintLine.substr(lastPos, 1));
 				}
 			}
 			else if (hintLine[pos] == ' ') {
@@ -147,24 +147,45 @@ bool LexAnalyse::isKeyword(std::string in)
 // 得到LexToken表
 std::vector<std::pair<int, std::string>> LexAnalyse::getTokenTable()
 {
-	return this->tokenLists.tokenList;
+	return this->tokenList->tokenList;
 }
 
 
 // 处理分析error
 void LexAnalyse::error(std::string line, int lines, int begin, int end)
 {
-	struct errors e;
+	LexAnalyse::errors e;
 	e.line = line;
 	e.lines = lines;
 	e.begin = begin;
 	e.end = end;
 	errorStack.push_back(e);
-	std::cout << "Lex Analysis error: " << " Line:" << lines << std::endl;
+	/*std::cout << "Lex Analysis error: " << " Line:" << lines << std::endl;
 	std::cout << line << std::endl;
 	for (int i = 0; i < end; ++i) {
 		if (i < begin) std::cout << " ";
 		else std::cout << "^";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl;*/
+}
+
+
+// 设置TokenList
+void LexAnalyse::setTokenList(TokenList *tokenList)
+{
+	this->tokenList = tokenList;
+}
+
+
+// 判断是否有错误需要处理
+bool LexAnalyse::hasError()
+{
+	return !errorStack.empty();
+}
+
+
+// 获取错误数据
+std::vector<LexAnalyse::errors> LexAnalyse::getError()
+{
+	return errorStack;
 }

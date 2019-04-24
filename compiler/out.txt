@@ -1,0 +1,4 @@
+Lex Analysis error: 
+ Line:6
+while (1c<10)
+       ^

@@ -4,11 +4,13 @@
 #include "pch.h"
 #include "headerInclude.h"
 #include "LexAnalyse.h"
+#include "GrammerAnalysis.h"
 
 using namespace std;
 
 ifstream inf;
 ofstream outf;
+TokenList tokenList = TokenList();
 
 int main()
 {
@@ -28,15 +30,46 @@ int main()
 		cout << "Press any key to continue.." << endl;
 		return 0;
 	}
+
 	std::string strings;
 	vector<string> input;
 	while (std::getline(inf, strings)) {
 		input.push_back(strings);
 	}
+	// 词法分析
 	LexAnalyse lex = LexAnalyse(input);
+	lex.setTokenList(&tokenList);
 	lex.lexAnalysic();
+	// 词法分析-错误处理
+	if (lex.hasError()) {
+		std::vector<LexAnalyse::errors> errorList = lex.getError();
+		std::cout << "Lex Analysis error: " << std::endl;
+		outf << "Lex Analysis error: " << std::endl;
+		for (auto it = errorList.begin(); it != errorList.end(); ++it) {
+			std::cout << " Line:" << it->lines << std::endl;
+			std::cout << it->line << std::endl;
+			outf << " Line:" << it->lines << std::endl;
+			outf << it->line << std::endl;
+			for (int i = 0; i < it->end; ++i) {
+				if (i < it->begin) { 
+					std::cout << " ";
+					outf << " ";
+				}
+				else { 
+					std::cout << "^"; 
+					outf << "^";
+				}
+			}
+			std::cout << std::endl;
+		}
+		std::cout << "Analysis Stoped! Please check the code again!";
+		return 0;
+	}
 	std::vector<std::pair<int, std::string>> tokenList;
 	tokenList = lex.getTokenTable();
+	// 进行语法分析
+
+	// 进行语法制导的语义翻译
 
 	return 0;
 }
