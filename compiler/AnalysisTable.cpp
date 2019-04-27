@@ -75,19 +75,23 @@ void AnalysisTable::insertTable()
 	set0.grams = closure(tmps);
 	AnalysisTable::itemSet.insert(set0);
 	// 开始逐步分析
-	bool flag = false;
+	int beforeflag;
 	do {
+		beforeflag = this->itemSet.size();
 		// 对所有的项集分析
 		for (auto C_it = AnalysisTable::itemSet.begin(); C_it != AnalysisTable::itemSet.end(); ++C_it) {
 			// 项集里每个文法的后一个元素
 			for (auto X_it = C_it->grams.begin(); X_it != C_it->grams.end(); ++X_it) {
+				// 此时的状态 C_it->status;
 				if (X_it->gramRule.right.size() <= X_it->status) {
 					// x->x.
 					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == "S") {
 						// S'->S.
+						setAction("acc", C_it->status, std::pair<int, std::string>(END, "$"));
 					}
 					else {
 						// x->x.
+
 					}
 				}
 				else {
@@ -95,14 +99,50 @@ void AnalysisTable::insertTable()
 					std::pair<int, std::string> nextPos = X_it->gramRule.right[X_it->status];
 					if (nextPos.first == BODER) {
 						// x->xx.Xxx
+						int next = findItem(AnalysisTable::GOTO(C_it->grams, nextPos));
+						AnalysisTable::setGOTO(next, C_it->status, nextPos);
 					}
 					else {
 						// x->xx.xx
+						int next = findItem(AnalysisTable::GOTO(C_it->grams, nextPos));
+						std::string tmp;
+						std::stringstream ss;
+						ss << "s" << next;
+						ss >> tmp;
+						AnalysisTable::setAction(tmp, C_it->status, nextPos);
 					}
 				}
 
 			}
 		}
 
-	} while (flag);
+	} while (beforeflag != this->itemSet.size());
+	
+}
+// 设置GOTO表格内容
+void AnalysisTable::setGOTO(const int &setT, const int &i, const std::pair<int, std::string> &B)
+{
+	this->Table[i].t_goto.gotoMap[B] = setT;
+}
+
+// 设置Action项目
+void AnalysisTable::setAction(const std::string &setT, const int &i, const std::pair<int, std::string> &a)
+{
+	this->Table[i].t_action.actionMap[a] = setT;
+}
+
+
+// 寻找item项目
+int AnalysisTable::findItem(const std::set<AnalysisTable::statusGram> &item)
+{
+	// 寻找相应的状态
+	for (auto it = this->itemSet.begin(); it != this->itemSet.end(); ++it) {
+		if (it->grams == item) return it->status;
+	}
+	// 如果没有则创建
+	AnalysisTable::item tmp;
+	tmp.status = this->itemSet.size();
+	tmp.grams = item;
+	this->itemSet.insert(tmp);
+	return tmp.status;
 }

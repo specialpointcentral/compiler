@@ -27,8 +27,15 @@ public:
 		std::pair<int, std::string> left;				// 左部
 		std::vector<std::pair<int, std::string>> right;	// 右部
 
-		bool operator == (const GramRule &a) {
-			return this->left == a.left && this->right == a.right;
+		friend bool operator == (const AnalysisTable::GramRule &a, const AnalysisTable::GramRule &input) {
+			return a.left == input.left && a.right == input.right;
+		}
+		friend bool operator < (const AnalysisTable::GramRule &a, const AnalysisTable::GramRule &input) {
+			if (a.left == input.left) {
+				return  a.right < input.right;
+			}
+			else
+				return a.left < input.left;
 		}
 	};
 	// 有状态的语法变量
@@ -37,6 +44,17 @@ public:
 		int status;
 		GramRule gramRule;
 		statusGram(int status, GramRule gramRule) :status(status), gramRule(gramRule) {}
+		friend bool operator == (const AnalysisTable::statusGram &a, const AnalysisTable::statusGram &input) {
+			if (a.status == input.status && a.gramRule == input.gramRule)
+				return true;
+			else return false;
+		}
+		friend bool operator < (const AnalysisTable::statusGram &a, const AnalysisTable::statusGram &input) {
+			if (a.status == input.status) {
+				return a.gramRule < input.gramRule;
+			}
+			else return a.status < input.status;
+		}
 	};
 	// 项集
 	class item {
@@ -44,8 +62,11 @@ public:
 		int status;
 		std::set<AnalysisTable::statusGram> grams;
 		// 相等重载
-		bool operator == (const AnalysisTable::item &input) {
-			return this->grams == input.grams;
+		friend bool operator == (const AnalysisTable::item &input, const AnalysisTable::item &a) {
+			return a.grams == input.grams;
+		}
+		friend bool operator < (const AnalysisTable::item &input, const AnalysisTable::item &a) {
+			return a.grams < input.grams;
 		}
 	};
 	// 项集族
@@ -74,5 +95,11 @@ private:
 	std::set<AnalysisTable::statusGram> GOTO(std::set<AnalysisTable::statusGram>, std::pair<int, std::string>);
 	// 填充table
 	void insertTable();
+	// 设置GOTO表格内容
+	void setGOTO(const int &, const int &, const std::pair<int, std::string> &);
+	// 设置Action项目
+	void setAction(const std::string &, const int &, const std::pair<int, std::string> &);
+	// 寻找item项目
+	int findItem(const std::set<AnalysisTable::statusGram> &);
 };
 
