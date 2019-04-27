@@ -35,15 +35,15 @@ void GrammerAnalysis::beginAnalysis()
 		std::string action = analysisTable->Table[this->stauts.top()].t_action.actionMap[posLex];
 		int nextStep;
 		std::stringstream ss;
-		ss << action.substr(2);
+		ss << action.substr(1);
 		ss >> nextStep;
 		if (action.size() == 0) {
 			// TODO error
-			break;
+			return;
 		}
 		else if (action == "acc") {
 			// 通过
-			break;
+			return;
 		}
 		else  if (action[0] == 's') {
 			// 移入操作
@@ -52,7 +52,7 @@ void GrammerAnalysis::beginAnalysis()
 			// 指针后移
 			if (!this->tokenList->posNext()) {
 				// TODO error
-				break;
+				return;
 			}
 		}
 		else if (action[0] == 'r') {
@@ -60,8 +60,15 @@ void GrammerAnalysis::beginAnalysis()
 			AnalysisTable::GramRule gramrule = analysisTable->realGram[nextStep];
 			for (int i = 0; i < gramrule.right.size(); ++i) {
 				// 全部出栈
-				this->stauts.pop();
-				this->sym.pop();
+				if (!this->stauts.empty() && !this->sym.empty()) {
+					this->stauts.pop();
+					this->sym.pop();
+				}
+				else {
+					// TODO error
+					return;
+				}
+				
 			}
 			// 左部压栈
 			this->sym.push(gramrule.left);
@@ -70,7 +77,7 @@ void GrammerAnalysis::beginAnalysis()
 		}
 		else {
 			// TODO error
-			break;
+			return;
 		}
 	}
 }

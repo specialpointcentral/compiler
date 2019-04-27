@@ -87,7 +87,7 @@ void AnalysisTable::insertTable()
 					// x->x.
 					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == "S") {
 						// S'->S.
-						setAction("acc", C_it->status, std::pair<int, std::string>(END, "$"));
+						setAction("acc", C_it->status, std::pair<int, std::string>(END, "$")); 
 					}
 					else {
 						// x->x.
