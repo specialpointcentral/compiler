@@ -101,5 +101,14 @@ private:
 	void setAction(const std::string &, const int &, const std::pair<int, std::string> &);
 	// 寻找item项目
 	int findItem(const std::set<AnalysisTable::statusGram> &);
+	// 返回first集合
+	std::set<std::pair<int, std::string>> FIRST(std::pair<int,std::string>);
+	std::set<std::pair<int, std::string>> FIRST(std::vector<std::pair<int, std::string>>);
+	// 返回follow集合
+	std::set<std::pair<int, std::string>> FOLLOW(std::pair<int, std::string>);
+	// first集合
+	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FIRSTSet;
+	// follow集合
+	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FOLLOWSet;
 };
 

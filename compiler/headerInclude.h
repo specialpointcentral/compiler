@@ -15,3 +15,4 @@ constexpr auto ID = 3;
 constexpr auto OP = 4;
 constexpr auto END = 5;
 constexpr auto BODER = 6;	// ·ÇÖÕ½á·û
+constexpr auto EMPTY = 7;	// ¿Õ´®

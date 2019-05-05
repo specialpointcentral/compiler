@@ -1,4 +1,8 @@
 Lex Analysis error: 
- Line:6
-while (1c<10)
-       ^
+ Line:9
+else~~~~~~
+    ^ Line:9
+else~~~~~~
+      ^ Line:9
+else~~~~~~
+        ^
