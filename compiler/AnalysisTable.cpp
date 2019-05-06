@@ -1,16 +1,12 @@
 #include "AnalysisTable.h"
 
-
-
 AnalysisTable::AnalysisTable()
 {
 }
 
-
 AnalysisTable::~AnalysisTable()
 {
 }
-
 
 std::set<AnalysisTable::statusGram> AnalysisTable::closure(std::set<AnalysisTable::statusGram> input)
 {
@@ -20,6 +16,7 @@ std::set<AnalysisTable::statusGram> AnalysisTable::closure(std::set<AnalysisTabl
 		inputFlag = false;
 		// J 中的每个项
 		for (auto J_it = J.begin(); J_it != J.end(); ++J_it) {
+			if (J_it->gramRule.right.size() == J_it->status) continue;
 			std::pair<int, std::string> nextLex = J_it->gramRule.right[J_it->status];
 			if (nextLex.first == BODER) {
 				// 是非终结符，准备加入其它部分
@@ -27,7 +24,7 @@ std::set<AnalysisTable::statusGram> AnalysisTable::closure(std::set<AnalysisTabl
 					// 找到加入的东西
 					if (realGram[j].left == nextLex) {
 						// 可能可以加入
-						if (J.count(statusGram(0, realGram[j])) == 0) {
+						if (J.find(statusGram(0, realGram[j])) == J.end()) {
 							// 加入
 							inputFlag = true;
 							J.insert(statusGram(0, realGram[j]));
@@ -46,7 +43,9 @@ std::set<AnalysisTable::statusGram> AnalysisTable::GOTO(std::set<AnalysisTable::
 	std::set<AnalysisTable::statusGram> J;
 	for (auto I_it = I.begin(); I_it != I.end(); I_it++)
 	{
-		// 
+		// x->x.
+		if (I_it->gramRule.right.size() <= I_it->status) continue;
+		// else
 		if (I_it->gramRule.right[I_it->status] == X || //针对INT10和ID
 			((I_it->gramRule.right[I_it->status].first == ID || I_it->gramRule.right[I_it->status].first == INT10) &&
 				I_it->gramRule.right[I_it->status].first == X.first)) {
@@ -69,8 +68,8 @@ void AnalysisTable::insertTable()
 	set0.status = 0;
 	AnalysisTable::GramRule tmp;
 	tmp.left.first = BODER;
-	tmp.left.second = "S'";
-	tmp.right.push_back(std::pair<int, std::string>(BODER, "S"));
+	tmp.left.second = std::string(BEGINITEM).append("'");
+	tmp.right.push_back(std::pair<int, std::string>(BODER, BEGINITEM));
 	std::set<AnalysisTable::statusGram> tmps;
 	tmps.insert(AnalysisTable::statusGram(0, AnalysisTable::GramRule(tmp)));
 	set0.grams = closure(tmps);
@@ -86,13 +85,29 @@ void AnalysisTable::insertTable()
 				// 此时的状态 C_it->status;
 				if (X_it->gramRule.right.size() <= X_it->status) {
 					// x->x.
-					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == "S") {
+					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == BEGINITEM) {
 						// S'->S.
 						setAction("acc", C_it->status, std::pair<int, std::string>(END, "$"));
 					}
 					else {
-						// x->x.
-						// TODO
+						// x->x. SLR分析法
+						// 执行归约操作
+						auto followSet = AnalysisTable::FOLLOW(X_it->gramRule.left);
+						int index;
+						for (auto itor = realGram.begin(); itor != realGram.end(); ++itor) {
+							if (itor->second == X_it->gramRule) {
+								index = itor->first;
+								break;
+							}
+						}
+						std::stringstream ss;
+						ss << "r" << index;
+						std::string tmp;
+						ss >> tmp;
+						// 所有的放进去
+						for (auto it = followSet.begin(); it != followSet.end(); ++it) {
+							AnalysisTable::setAction(tmp, C_it->status, *it);
+						}
 					}
 				}
 				else {
@@ -113,7 +128,6 @@ void AnalysisTable::insertTable()
 						AnalysisTable::setAction(tmp, C_it->status, nextPos);
 					}
 				}
-
 			}
 		}
 
@@ -149,9 +163,9 @@ int AnalysisTable::findItem(const std::set<AnalysisTable::statusGram> &item)
 }
 
 // 返回first集合
-std::set<std::pair<int, std::string>> AnalysisTable::FIRST(std::pair<int, std::string> input)
+std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, std::string> &input)
 {
-	if (input.first == BODER) {
+	if (input.first != BODER) {
 		// 终结符
 		std::set<std::pair<int, std::string>> first;
 		first.insert(input);
@@ -205,19 +219,21 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(std::pair<int, std::s
 	// 找first集合
 	return FIRSTSet[input];
 }
-std::set<std::pair<int, std::string>> AnalysisTable::FIRST(std::vector<std::pair<int, std::string>> input) {
+std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::vector<std::pair<int, std::string>> &input) {
 	std::set<std::pair<int, std::string>> tmp;
 	for (auto it = input.begin(); it != input.end(); ++it) {
+		// 此时是不是终结符
+		if (it->first != BODER) {
+			tmp.insert(*it);
+			break;
+		}
 		// 最后一个
+		std::set<std::pair<int, std::string>> p = FIRST(*it);
 		if (it + 1 == input.end()) {
-			std::set<std::pair<int, std::string>> p;
-			p = FIRST(*it);
-			tmp.insert(p.begin(),p.end());
+			tmp.insert(p.begin(), p.end());
 		}
 		else {
-			std::set<std::pair<int, std::string>> p;
-			p = FIRST(*it);
-			if (p.count(std::pair<int, std::string>(EMPTY, "")) != 0) {
+			if (p.find(std::pair<int, std::string>(EMPTY, "")) != p.end()) {
 				// 有空串
 				p.erase(std::pair<int, std::string>(EMPTY, ""));
 				tmp.insert(p.begin(), p.end());
@@ -232,9 +248,9 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(std::vector<std::pair
 }
 
 // 返回follow集合
-std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(std::pair<int, std::string> input)
+std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int, std::string> &input)
 {
-	if (input.first == BODER) {
+	if (input.first != BODER) {
 		// 终结符
 		std::set<std::pair<int, std::string>> follow;
 		follow.insert(input);
@@ -246,7 +262,7 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(std::pair<int, std::
 			return this->FOLLOWSet[input];
 		}
 		// 加入$
-		FOLLOWSet[std::pair<int, std::string>(BODER, "S")].insert(std::pair<int, std::string>(END, "$"));
+		FOLLOWSet[std::pair<int, std::string>(BODER, BEGINITEM)].insert(std::pair<int, std::string>(END, "$"));
 		int before, next;
 		do {
 			before = 0;
@@ -258,10 +274,11 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(std::pair<int, std::
 				// 内部一层遍历所有右边变量
 				for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
 					// p代表了p的follow
+					if (p->first != BODER) continue;	// 不计算终结符
 					bool hasEmpty = false;
-					if (p + 1 != it->second.right.end()) {
+					if (p + 1 != it->second.right.end()) {	// 不是最后一个
 						std::set<std::pair<int, std::string>> first = this->FIRST(std::vector<std::pair<int, std::string>>(p + 1, it->second.right.end()));
-						if (hasEmpty = (bool)first.count(std::pair<int, std::string>(EMPTY, ""))) {
+						if (hasEmpty = (first.find(std::pair<int, std::string>(EMPTY, "")) != first.end())) {
 							first.erase(std::pair<int, std::string>(EMPTY, ""));
 						}
 						FOLLOWSet[*p].insert(first.begin(), first.end());
@@ -278,4 +295,13 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(std::pair<int, std::
 		} while (before != next);
 	}
 	return std::set<std::pair<int, std::string>>();
+}
+
+
+// 设置语法分析表
+void AnalysisTable::setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input)
+{
+	for (int i = 0; i < input.size(); ++i) {
+		this->realGram[i] = AnalysisTable::GramRule(input[i].first, input[i].second);
+	}
 }

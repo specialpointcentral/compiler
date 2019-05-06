@@ -11,7 +11,8 @@ using namespace std;
 ifstream inf;
 ofstream outf;
 TokenList tokenList = TokenList();
-
+AnalysisTable analysisTable = AnalysisTable();
+std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> gramRule;
 int main()
 {
 	string filename;
@@ -24,7 +25,7 @@ int main()
 		cout << "Press any key to continue.." << endl;
 		return 0;
 	}
-	outf.open("out.txt", ios::out);
+	outf.open("d://desktop//out.txt", ios::out);
 	if (!outf.is_open()) {
 		cout << "Unable to open the output file. " << endl;
 		cout << "Press any key to continue.." << endl;
@@ -51,12 +52,12 @@ int main()
 			outf << " Line:" << it->lines << std::endl;
 			outf << it->line << std::endl;
 			for (int i = 0; i < it->end; ++i) {
-				if (i < it->begin) { 
+				if (i < it->begin) {
 					std::cout << " ";
 					outf << " ";
 				}
-				else { 
-					std::cout << "^"; 
+				else {
+					std::cout << "^";
 					outf << "^";
 				}
 			}
@@ -65,12 +66,53 @@ int main()
 		std::cout << "Analysis Stoped! Please check the code again!";
 		return 0;
 	}
-	std::vector<std::pair<int, std::string>> tokenList;
-	tokenList = lex.getTokenTable();
+	std::vector<std::pair<int, std::string>> tokenLists;
+	tokenLists = lex.getTokenTable();
+	// 输出分析结果
+	for (auto it = tokenLists.begin(); it != tokenLists.end(); ++it) {
+		outf << "< " << it->first << " , " << it->second << " >" << std::endl;
+	}
+	//std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>
+	std::vector<std::pair<int, std::string>> tmp;
+	tmp.push_back(std::make_pair(BODER, "E"));
+	tmp.push_back(std::make_pair(OP, "+"));
+	tmp.push_back(std::make_pair(BODER,"T"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER,"E"),tmp));
+
+	tmp.clear();
+	tmp.push_back(std::make_pair(BODER, "T"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "E"), tmp));
+
+	tmp.clear();
+	tmp.push_back(std::make_pair(BODER, "T"));
+	tmp.push_back(std::make_pair(OP, "*"));
+	tmp.push_back(std::make_pair(BODER, "F"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "T"), tmp));
+
+	tmp.clear();
+	tmp.push_back(std::make_pair(BODER, "F"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "T"), tmp));
+
+
+	tmp.clear();
+	tmp.push_back(std::make_pair(OP, "("));
+	tmp.push_back(std::make_pair(BODER, "E"));
+	tmp.push_back(std::make_pair(OP, ")'"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "F"), tmp));
+
+	tmp.clear();
+	tmp.push_back(std::make_pair(ID, ""));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "F"), tmp));
+
+
+	// 生成状态转换表
+	analysisTable.setRealGram(gramRule);
+	analysisTable.insertTable();
 	// 进行语法分析
-
+	GrammerAnalysis gram = GrammerAnalysis(&tokenList, &analysisTable);
+	gram.beginAnalysis();
 	// 进行语法制导的语义翻译
-
+	
 	return 0;
 }
 

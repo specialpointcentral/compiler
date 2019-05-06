@@ -26,12 +26,12 @@ bool LexAnalyse::lexAnalysic()
 				else if (!isLetter(hintLine[pos]) && !isNumber(hintLine[pos])) --pos;
 				// 判断是不是keyword
 				if (isKeyword(hintLine.substr(lastPos, pos - lastPos + 1))) {
-					// TODO 加入keyword
+					// 加入keyword
 					// std::cout << "keyword\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(KEYWORDS, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
 				else {
-					// TODO 加入id
+					// 加入id
 					// std::cout << "id\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(ID, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
@@ -54,7 +54,7 @@ bool LexAnalyse::lexAnalysic()
 				}
 				else {
 					// int10
-					// TODO 加入int10
+					// 加入int10
 					// std::cout << "int10\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(INT10, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
@@ -62,13 +62,13 @@ bool LexAnalyse::lexAnalysic()
 			else if (isOp(hintLine[pos])) {
 				// 对于是op的，考虑 1-only,2-double
 				if (isOp(hintLine.substr(lastPos, 2))) {
-					// TODO 加入两个的 hintLine.substr(lastPos, 2)
+					// 加入两个的 hintLine.substr(lastPos, 2)
 					// std::cout << "op\t" << hintLine.substr(lastPos, 2) << std::endl;
 					tokenList->Toke(OP, hintLine.substr(lastPos, 2));
 					++pos;
 				}
 				else {
-					// TODO 加入一个的
+					// 加入一个的
 					// std::cout << "op\t" << hintLine.substr(lastPos, 1) << std::endl;
 					tokenList->Toke(OP, hintLine.substr(lastPos, 1));
 				}

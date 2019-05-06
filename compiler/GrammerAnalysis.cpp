@@ -34,15 +34,17 @@ void GrammerAnalysis::beginAnalysis()
 		}
 		std::string action = analysisTable->Table[this->stauts.top()].t_action.actionMap[posLex];
 		int nextStep;
+		if (action.size() == 0) {
+			// TODO error
+			std::cout << "error!";
+			return;
+		}
 		std::stringstream ss;
 		ss << action.substr(1);
 		ss >> nextStep;
-		if (action.size() == 0) {
-			// TODO error
-			return;
-		}
-		else if (action == "acc") {
+		if (action == "acc") {
 			// 通过
+			std::cout << "Grammer Analysis Complete!" << std::endl;
 			return;
 		}
 		else  if (action[0] == 's') {
@@ -52,6 +54,7 @@ void GrammerAnalysis::beginAnalysis()
 			// 指针后移
 			if (!this->tokenList->posNext()) {
 				// TODO error
+				std::cout << "error!";
 				return;
 			}
 		}
@@ -66,6 +69,7 @@ void GrammerAnalysis::beginAnalysis()
 				}
 				else {
 					// TODO error
+					std::cout << "error!";
 					return;
 				}
 				
@@ -77,6 +81,7 @@ void GrammerAnalysis::beginAnalysis()
 		}
 		else {
 			// TODO error
+			std::cout << "error!";
 			return;
 		}
 	}

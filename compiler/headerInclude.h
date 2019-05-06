@@ -16,3 +16,6 @@ constexpr auto OP = 4;
 constexpr auto END = 5;
 constexpr auto BODER = 6;	// 非终结符
 constexpr auto EMPTY = 7;	// 空串
+
+
+constexpr auto BEGINITEM = "E";	// 开始符号

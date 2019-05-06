@@ -26,7 +26,8 @@ public:
 	public:
 		std::pair<int, std::string> left;				// 左部
 		std::vector<std::pair<int, std::string>> right;	// 右部
-
+		GramRule(std::pair<int, std::string> a, std::vector<std::pair<int, std::string>>b) :left(a), right(b) {}
+		GramRule() {}
 		friend bool operator == (const AnalysisTable::GramRule &a, const AnalysisTable::GramRule &input) {
 			return a.left == input.left && a.right == input.right;
 		}
@@ -88,13 +89,12 @@ public:
 	//				- int:GOTO状态
 	// </summary>
 	std::map<int, AnalysisTable::SingleLine> Table;
-
+	// 填充table
+	void insertTable();
 
 private:
 	std::set<AnalysisTable::statusGram> closure(std::set<AnalysisTable::statusGram>);
 	std::set<AnalysisTable::statusGram> GOTO(std::set<AnalysisTable::statusGram>, std::pair<int, std::string>);
-	// 填充table
-	void insertTable();
 	// 设置GOTO表格内容
 	void setGOTO(const int &, const int &, const std::pair<int, std::string> &);
 	// 设置Action项目
@@ -102,13 +102,16 @@ private:
 	// 寻找item项目
 	int findItem(const std::set<AnalysisTable::statusGram> &);
 	// 返回first集合
-	std::set<std::pair<int, std::string>> FIRST(std::pair<int,std::string>);
-	std::set<std::pair<int, std::string>> FIRST(std::vector<std::pair<int, std::string>>);
+	std::set<std::pair<int, std::string>> FIRST(const std::pair<int, std::string>&);
+	std::set<std::pair<int, std::string>> FIRST(const std::vector<std::pair<int, std::string>>&);
 	// 返回follow集合
-	std::set<std::pair<int, std::string>> FOLLOW(std::pair<int, std::string>);
+	std::set<std::pair<int, std::string>> FOLLOW(const std::pair<int, std::string>&);
 	// first集合
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FIRSTSet;
 	// follow集合
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FOLLOWSet;
+public:
+	// 设置语法分析表
+	void setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>&);
 };
 
