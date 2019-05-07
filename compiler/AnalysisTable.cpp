@@ -83,7 +83,8 @@ void AnalysisTable::insertTable()
 			// 项集里每个文法的后一个元素
 			for (auto X_it = C_it->grams.begin(); X_it != C_it->grams.end(); ++X_it) {
 				// 此时的状态 C_it->status;
-				if (X_it->gramRule.right.size() <= X_it->status) {
+				// 对于空串，和规约项
+				if (X_it->gramRule.right.size() <= X_it->status || (X_it->gramRule.right.size() == 1 && X_it->gramRule.right[0].first == EMPTY)) {
 					// x->x.
 					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == BEGINITEM) {
 						// S'->S.
@@ -191,9 +192,10 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, 
 					// 查找里面
 					for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
 						// 是非终结符，加入
-						FIRSTSet[left].insert(FIRSTSet[right].begin(), FIRSTSet[right].end());
+						auto tmp = FIRSTSet[right];
 						// 去除空
 						FIRSTSet[left].erase(std::pair<int, std::string>(EMPTY, ""));
+						FIRSTSet[left].insert(tmp.begin(), tmp.end());
 						// 有空串
 						if (FIRSTSet[right].find(std::pair<int, std::string>(EMPTY, "")) != FIRSTSet[right].end()) {
 							// 是最后一个
@@ -250,51 +252,43 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::vector<std
 // 返回follow集合
 std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int, std::string> &input)
 {
-	if (input.first != BODER) {
-		// 终结符
-		std::set<std::pair<int, std::string>> follow;
-		follow.insert(input);
-		return follow;
+	if (this->FOLLOWSet.size() != 0) {
+		// 说明已经构建过了
+		return this->FOLLOWSet[input];
 	}
-	else {
-		if (this->FOLLOWSet.size() != 0) {
-			// 说明已经构建过了
-			return this->FOLLOWSet[input];
+	// 加入$
+	FOLLOWSet[std::pair<int, std::string>(BODER, BEGINITEM)].insert(std::pair<int, std::string>(END, "$"));
+	int before, next;
+	do {
+		before = 0;
+		for (auto i = FOLLOWSet.begin(); i != FOLLOWSet.end(); ++i) {
+			before += i->second.size();
 		}
-		// 加入$
-		FOLLOWSet[std::pair<int, std::string>(BODER, BEGINITEM)].insert(std::pair<int, std::string>(END, "$"));
-		int before, next;
-		do {
-			before = 0;
-			for (auto i = FOLLOWSet.begin(); i != FOLLOWSet.end(); ++i) {
-				before += i->second.size();
-			}
-			// 外层整个语法遍历
-			for (auto it = realGram.begin(); it != realGram.end(); ++it) {
-				// 内部一层遍历所有右边变量
-				for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
-					// p代表了p的follow
-					if (p->first != BODER) continue;	// 不计算终结符
-					bool hasEmpty = false;
-					if (p + 1 != it->second.right.end()) {	// 不是最后一个
-						std::set<std::pair<int, std::string>> first = this->FIRST(std::vector<std::pair<int, std::string>>(p + 1, it->second.right.end()));
-						if (hasEmpty = (first.find(std::pair<int, std::string>(EMPTY, "")) != first.end())) {
-							first.erase(std::pair<int, std::string>(EMPTY, ""));
-						}
-						FOLLOWSet[*p].insert(first.begin(), first.end());
+		// 外层整个语法遍历
+		for (auto it = realGram.begin(); it != realGram.end(); ++it) {
+			// 内部一层遍历所有右边变量
+			for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
+				// p代表了p的follow
+				bool hasEmpty = false;
+				if (p + 1 != it->second.right.end()) {	// 不是最后一个
+					std::set<std::pair<int, std::string>> first = this->FIRST(std::vector<std::pair<int, std::string>>(p + 1, it->second.right.end()));
+					if (hasEmpty = (first.find(std::pair<int, std::string>(EMPTY, "")) != first.end())) {
+						first.erase(std::pair<int, std::string>(EMPTY, ""));
 					}
-					if (p + 1 == it->second.right.end() || hasEmpty) {
-						FOLLOWSet[*p].insert(FOLLOWSet[it->second.left].begin(), FOLLOWSet[it->second.left].end());
-					}
+					FOLLOWSet[*p].insert(first.begin(), first.end());
+				}
+				if (p + 1 == it->second.right.end() || hasEmpty) {
+					FOLLOWSet[*p].insert(FOLLOWSet[it->second.left].begin(), FOLLOWSet[it->second.left].end());
 				}
 			}
-			next = 0;
-			for (auto i = FOLLOWSet.begin(); i != FOLLOWSet.end(); ++i) {
-				next += i->second.size();
-			}
-		} while (before != next);
-	}
-	return std::set<std::pair<int, std::string>>();
+		}
+		next = 0;
+		for (auto i = FOLLOWSet.begin(); i != FOLLOWSet.end(); ++i) {
+			next += i->second.size();
+		}
+	} while (before != next);
+	
+	return this->FOLLOWSet[input];
 }
 
 

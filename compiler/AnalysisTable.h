@@ -27,7 +27,10 @@ public:
 		std::pair<int, std::string> left;				// ×ó²¿
 		std::vector<std::pair<int, std::string>> right;	// ÓÒ²¿
 		GramRule(std::pair<int, std::string> a, std::vector<std::pair<int, std::string>>b) :left(a), right(b) {}
-		GramRule() {}
+		GramRule() {
+			left = std::pair<int, std::string>();
+			right = std::vector<std::pair<int, std::string>>();
+		}
 		friend bool operator == (const AnalysisTable::GramRule &a, const AnalysisTable::GramRule &input) {
 			return a.left == input.left && a.right == input.right;
 		}

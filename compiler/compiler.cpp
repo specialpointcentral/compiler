@@ -13,6 +13,11 @@ ofstream outf;
 TokenList tokenList = TokenList();
 AnalysisTable analysisTable = AnalysisTable();
 std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> gramRule;
+
+void spiltArray(const string&, vector<string>&, const string&);
+std::pair<int, std::string> getPair(const std::string &);
+bool readGram(const std::string &, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &);
+
 int main()
 {
 	string filename;
@@ -25,6 +30,9 @@ int main()
 		cout << "Press any key to continue.." << endl;
 		return 0;
 	}
+	cout << "Open gram file:";
+	cin >> filename;
+	readGram(filename, gramRule);
 	outf.open("d://desktop//out.txt", ios::out);
 	if (!outf.is_open()) {
 		cout << "Unable to open the output file. " << endl;
@@ -73,11 +81,13 @@ int main()
 		outf << "< " << it->first << " , " << it->second << " >" << std::endl;
 	}
 	//std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>
+
+	/*
 	std::vector<std::pair<int, std::string>> tmp;
 	tmp.push_back(std::make_pair(BODER, "E"));
 	tmp.push_back(std::make_pair(OP, "+"));
-	tmp.push_back(std::make_pair(BODER,"T"));
-	gramRule.push_back(std::make_pair(std::make_pair(BODER,"E"),tmp));
+	tmp.push_back(std::make_pair(BODER, "T"));
+	gramRule.push_back(std::make_pair(std::make_pair(BODER, "E"), tmp));
 
 	tmp.clear();
 	tmp.push_back(std::make_pair(BODER, "T"));
@@ -103,7 +113,7 @@ int main()
 	tmp.clear();
 	tmp.push_back(std::make_pair(ID, ""));
 	gramRule.push_back(std::make_pair(std::make_pair(BODER, "F"), tmp));
-
+	*/
 
 	// 生成状态转换表
 	analysisTable.setRealGram(gramRule);
@@ -112,8 +122,81 @@ int main()
 	GrammerAnalysis gram = GrammerAnalysis(&tokenList, &analysisTable);
 	gram.beginAnalysis();
 	// 进行语法制导的语义翻译
-	
+
 	return 0;
+}
+
+bool readGram(const std::string &inputFile, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input) {
+	ifstream inf;
+	inf.open(inputFile, ios::in);
+	if (!inf.is_open()) {
+		cout << "Unable to open the input file. " << endl;
+		cout << "Press any key to continue.." << endl;
+		return false;
+	}
+	std::string line;
+	while (getline(inf, line)) {
+		std::pair<int, std::string> left;
+		std::vector<std::pair<int, std::string>> right;
+		// 先将左边加入
+		std::string::size_type pos = line.find("→");
+		left = getPair(line.substr(0, pos));
+		pos += std::string("→").size();
+		// 加入右边的
+		std::vector<std::string> s;
+		spiltArray(line.substr(pos), s, "|");
+		for (auto it = s.begin(); it != s.end(); ++it) {
+			std::vector<std::string> p;
+			spiltArray(*it, p, " ");
+			for (auto pt = p.begin(); pt != p.end(); ++pt) {
+				right.push_back(getPair(*pt));
+			}
+			input.push_back(std::make_pair(left, right));
+			right.clear();
+		}
+
+	}
+	return true;
+}
+
+void spiltArray(const string& s, vector<string>& v, const string& c) {
+	std::string::size_type pos1, pos2;
+	pos2 = s.find(c);
+	pos1 = 0;
+	while (std::string::npos != pos2)
+	{
+		v.push_back(s.substr(pos1, pos2 - pos1));
+
+		pos1 = pos2 + c.size();
+		pos2 = s.find(c, pos1);
+	}
+	if (pos1 != s.length())
+		v.push_back(s.substr(pos1));
+}
+std::pair<int, std::string> getPair(const std::string &input) {
+	std::string tmp = input.substr(1, input.size() - 2);
+	std::vector<std::string> split;
+	spiltArray(tmp, split, ",");
+	int left;
+	if (split[0] == "KEYWORDS") {
+		left = 1;
+	}
+	else if (split[0] == "INT10") {
+		left = 2;
+	}
+	else if (split[0] == "ID") {
+		left = 3;
+	}
+	else if (split[0] == "OP") {
+		left = 4;
+	}
+	else if (split[0] == "BODER") {
+		left = 6;
+	}
+	else if (split[0] == "EMPTY") {
+		left = 7;
+	}
+	return std::make_pair(left, split.size() == 1 ? "" : split[1]);
 }
 
 

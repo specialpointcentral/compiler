@@ -18,4 +18,4 @@ constexpr auto BODER = 6;	// 非终结符
 constexpr auto EMPTY = 7;	// 空串
 
 
-constexpr auto BEGINITEM = "E";	// 开始符号
+constexpr auto BEGINITEM = "P";	// 开始符号

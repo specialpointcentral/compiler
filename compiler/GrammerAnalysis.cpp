@@ -61,7 +61,9 @@ void GrammerAnalysis::beginAnalysis()
 		else if (action[0] == 'r') {
 			// 归约操作
 			AnalysisTable::GramRule gramrule = analysisTable->realGram[nextStep];
-			for (int i = 0; i < gramrule.right.size(); ++i) {
+			// 消除空串影响
+			int psize = (gramrule.right.size() == 1 && gramrule.right[0].first == EMPTY) ? 0 : gramrule.right.size();
+			for (int i = 0; i < psize; ++i) {
 				// 全部出栈
 				if (!this->stauts.empty() && !this->sym.empty()) {
 					this->stauts.pop();
@@ -72,7 +74,7 @@ void GrammerAnalysis::beginAnalysis()
 					std::cout << "error!";
 					return;
 				}
-				
+
 			}
 			// 左部压栈
 			this->sym.push(gramrule.left);
