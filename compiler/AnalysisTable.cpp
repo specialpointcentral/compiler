@@ -344,7 +344,7 @@ void AnalysisTable::printToFile()
 	// 输出状态转换
 	*outf << "#### Transfer Machine" << std::endl;
 	for (auto s = this->itemSet.begin(); s != this->itemSet.end(); ++s) {
-		*outf << "| 状态" << s->status << " | Left | Right |" << std::endl;
+		*outf << "| Status:" << s->status << " | Left | Right |" << std::endl;
 		*outf << "|---|---|---|" << std::endl;
 		for (auto it = s->grams.begin(); it != s->grams.end(); ++it) {
 			*outf << "| " << it->status << " | < " << it->gramRule.left.first << " , " << it->gramRule.left.second << " > |";
@@ -362,6 +362,51 @@ void AnalysisTable::printToFile()
 
 	// 输出状态表
 	*outf << "#### Transfer Table" << std::endl;
+	// 统计所有状态
+	std::set<std::pair<int, std::string>> t_action, t_goto;
+	for (auto p = this->Table.begin(); p != this->Table.end(); ++p) {
+		for (auto it = p->second.t_action.actionMap.begin(); it != p->second.t_action.actionMap.end(); ++it) {
+			t_action.insert(it->first);
+		}
+		for (auto it = p->second.t_goto.gotoMap.begin(); it != p->second.t_goto.gotoMap.end(); ++it) {
+			t_goto.insert(it->first);
+		}
+	}
+	*outf << "<table>" << std::endl;
+	// 输出表头
+	*outf << "<tr>" << std::endl
+		<< "<th rowspan=\"2\"> # </th>" << std::endl
+		<< "<th colspan=\"" << t_action.size() << "\">ACTION</th>" << std::endl
+		<< "<th colspan=\"" << t_goto.size() << "\">GOTO</th>" << std::endl
+		<< "</tr>" << std::endl
+		<< "<tr>" << std::endl;
+	for (auto it = t_action.begin(); it != t_action.end(); ++it) {
+		*outf << "<th>< " << it->first << " , " << it->second << " ></th>" << std::endl;
+	}
+	for (auto it = t_goto.begin(); it != t_goto.end(); ++it) {
+		*outf << "<th>< " << it->first << " , " << it->second << " ></th>" << std::endl;
+	}
+	*outf << "</tr>" << std::endl;
+	// 按行输出
+	for (auto p = this->Table.begin(); p != this->Table.end(); ++p) {
+		*outf << "<tr>" << std::endl;
+		*outf << "<td>" << p->first << "</td>" << std::endl;
+		for (auto it = t_action.begin(); it != t_action.end(); ++it) {
+			auto s = p->second.t_action.actionMap.find(*it);
+			if (s != p->second.t_action.actionMap.end())
+				*outf << "<td> " << s->second << " </td>" << std::endl;
+			else
+				*outf << "<td> </td>" << std::endl;
+		}
+		for (auto it = t_goto.begin(); it != t_goto.end(); ++it) {
+			auto s = p->second.t_goto.gotoMap.find(*it);
+			if(s != p->second.t_goto.gotoMap.end())
+				*outf << "<td> " << s->second << " </td>" << std::endl;
+			else
+				*outf << "<td> </td>" << std::endl;
+		}
+		*outf << "</tr>" << std::endl;
+	}
 
-
+	*outf << "</table>" << std::endl;
 }
