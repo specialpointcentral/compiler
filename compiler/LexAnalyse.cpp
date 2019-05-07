@@ -1,10 +1,11 @@
 #include "LexAnalyse.h"
 
 // 初始化词法分析器，每一行装入一个vector里
-LexAnalyse::LexAnalyse(std::vector<std::string> inputLex)
+LexAnalyse::LexAnalyse(std::vector<std::string> inputLex, std::ofstream *outf)
 {
 	this->inputLex = inputLex;
 	this->tokenList = nullptr;
+	this->outf = outf;
 }
 
 LexAnalyse::~LexAnalyse()
@@ -82,12 +83,13 @@ bool LexAnalyse::lexAnalysic()
 			else {
 				// TODO 出错
 				++pos;
-
 				error(hintLine, line + 1, lastPos, pos);
 			}
 		}
 	}
-	return 0;
+	*outf << "Lex Analysis Complete!" << std::endl;
+	std::cout << "Lex Analysis Complete!" << std::endl;
+	return true;
 }
 
 

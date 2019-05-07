@@ -11,7 +11,7 @@ public:
 		std::string line;
 		int begin, end, lines;
 	};
-	LexAnalyse(std::vector<std::string>);
+	LexAnalyse(std::vector<std::string>,std::ofstream *);
 	~LexAnalyse();
 	// 词法分析函数
 	bool lexAnalysic();
@@ -21,6 +21,7 @@ private:
 	std::vector<std::string> inputLex;
 	std::vector<LexAnalyse::errors> errorStack;
 	TokenList *tokenList;
+	std::ofstream *outf;
 	// 是否是字母
 	bool isLetter(char);
 	// 是否是数字

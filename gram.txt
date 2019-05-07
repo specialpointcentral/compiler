@@ -1,0 +1,8 @@
+<BODER,P>¡ú<BODER,D> <BODER,S>
+<BODER,D>¡ú<BODER,L> <ID,> <OP,;> <BODER,D>|<EMPTY,>
+<BODER,L>¡ú<KEYWORDS,int>|<KEYWORDS,float>
+<BODER,S>¡ú<ID,> <OP,=> <BODER,E> <OP,;>|<KEYWORDS,if> <OP,(> <BODER,C> <OP,)> <BODER,S>|<KEYWORDS,if> <OP,(> <BODER,C> <OP,)> <BODER,S> <KEYWORDS,else> <BODER,S>|<KEYWORDS,while> <OP,(> <BODER,C> <OP,)> <BODER,S>|<BODER,S> <BODER,S>
+<BODER,C>¡ú<BODER,E> <OP,<> <BODER,E>|<BODER,E> <OP,>> <BODER,E>|<BODER,E> <OP,==> <BODER,E>
+<BODER,E>¡ú<BODER,E> <OP,+> <BODER,T>|<BODER,E> <OP,-> <BODER,T>|<BODER,T>
+<BODER,T>¡ú<BODER,F>|<BODER,T> <OP,*> <BODER,F>|<BODER,T> <OP,/> <BODER,F>
+<BODER,F>¡ú<OP,(> <BODER,E> <OP,)>|<ID,>|<INT10,>

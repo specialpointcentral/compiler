@@ -133,6 +133,7 @@ void AnalysisTable::insertTable()
 		}
 
 	} while (beforeflag != this->itemSet.size());
+	this->printToFile();
 }
 
 // 设置GOTO表格内容
@@ -287,15 +288,80 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int,
 			next += i->second.size();
 		}
 	} while (before != next);
-	
+
 	return this->FOLLOWSet[input];
 }
 
 
 // 设置语法分析表
-void AnalysisTable::setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input)
+void AnalysisTable::setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input, std::ofstream *outf)
 {
 	for (int i = 0; i < input.size(); ++i) {
 		this->realGram[i] = AnalysisTable::GramRule(input[i].first, input[i].second);
 	}
+	this->outf = outf;
+}
+
+
+
+// 文件输出
+void AnalysisTable::printToFile()
+{
+	// 输出first
+	*outf << "### Grammar Analysis" << std::endl;
+	*outf << "#### First Table" << std::endl;
+	*outf << "| First |  |" << std::endl;
+	*outf << "|---|---|" << std::endl;
+	for (auto it = this->FIRSTSet.begin(); it != this->FIRSTSet.end(); ++it) {
+		*outf << "| < " << it->first.first << " , " << it->first.second << " > |";
+		for (auto p = it->second.begin(); p != it->second.end(); ++p) {
+			*outf << " < " << p->first << ", " << p->second << " >";
+		}
+		*outf << " |" << std::endl;
+	}
+	// 输出follow
+	*outf << "#### Follow Table" << std::endl;
+	*outf << "| Follow |  |" << std::endl;
+	*outf << "|---|---|" << std::endl;
+	for (auto it = this->FOLLOWSet.begin(); it != this->FOLLOWSet.end(); ++it) {
+		*outf << "| < " << it->first.first << " , " << it->first.second << " > |";
+		for (auto p = it->second.begin(); p != it->second.end(); ++p) {
+			*outf << " < " << p->first << ", " << p->second << " >";
+		}
+		*outf << " |" << std::endl;
+	}
+	// 输出原始的语法
+	*outf << "#### Grammar Table" << std::endl;
+	*outf << "| # | Left | Right |" << std::endl;
+	*outf << "|---|---|---|" << std::endl;
+	for (auto it = this->realGram.begin(); it != this->realGram.end(); ++it) {
+		*outf << "| " << it->first << " | < " << it->second.left.first << " , " << it->second.left.second << " > |";
+		for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
+			*outf << " < " << p->first << ", " << p->second << " >";
+		}
+		*outf << " |" << std::endl;
+	}
+	// 输出状态转换
+	*outf << "#### Transfer Machine" << std::endl;
+	for (auto s = this->itemSet.begin(); s != this->itemSet.end(); ++s) {
+		*outf << "| 状态" << s->status << " | Left | Right |" << std::endl;
+		*outf << "|---|---|---|" << std::endl;
+		for (auto it = s->grams.begin(); it != s->grams.end(); ++it) {
+			*outf << "| " << it->status << " | < " << it->gramRule.left.first << " , " << it->gramRule.left.second << " > |";
+			int count = 0;	// 位置定位
+			for (auto p = it->gramRule.right.begin(); p != it->gramRule.right.end(); ++p) {
+				if (count == it->status) *outf << ".";
+				*outf << " < " << p->first << ", " << p->second << " >";
+				++count;
+			}
+			if (count == it->status) *outf << ".";
+			*outf << " |" << std::endl;
+		}
+		*outf << std::endl;
+	}
+
+	// 输出状态表
+	*outf << "#### Transfer Table" << std::endl;
+
+
 }

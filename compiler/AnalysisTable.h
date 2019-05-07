@@ -70,7 +70,10 @@ public:
 			return a.grams == input.grams;
 		}
 		friend bool operator < (const AnalysisTable::item &input, const AnalysisTable::item &a) {
-			return a.grams < input.grams;
+			if (a.status == input.status)
+				return a.grams < input.grams;
+			else
+				return a.status < input.status;
 		}
 	};
 	// 项集族
@@ -113,8 +116,12 @@ private:
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FIRSTSet;
 	// follow集合
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FOLLOWSet;
+	std::ofstream *outf;
 public:
 	// 设置语法分析表
-	void setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>&);
+	void setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>&, std::ofstream *);
+private:
+	// 文件输出
+	void printToFile();
 };
 
