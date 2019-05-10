@@ -269,6 +269,7 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int,
 		for (auto it = realGram.begin(); it != realGram.end(); ++it) {
 			// 内部一层遍历所有右边变量
 			for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
+				if (p->first != BODER) continue;
 				// p代表了p的follow
 				bool hasEmpty = false;
 				if (p + 1 != it->second.right.end()) {	// 不是最后一个
