@@ -1,31 +1,31 @@
-#pragma once
+ï»¿#pragma once
 #include "headerInclude.h"
 class AnalysisTable
 {
 public:
 	AnalysisTable();
 	~AnalysisTable();
-	// ACTION±íÏî
+	// ACTIONè¡¨é¡¹
 	class Action {
 	public:
 		std::map<std::pair<int, std::string>, std::string> actionMap;
 	};
-	// GOTO±íÏî
+	// GOTOè¡¨é¡¹
 	class GOTO {
 	public:
 		std::map<std::pair<int, std::string>, int> gotoMap;
 	};
-	// ·ÖÎö±íÒ»ĞĞ±íÏî
+	// åˆ†æè¡¨ä¸€è¡Œè¡¨é¡¹
 	class SingleLine {
 	public:
 		AnalysisTable::Action t_action;
 		AnalysisTable::GOTO t_goto;
 	};
-	// Óï·¨±äÁ¿
+	// è¯­æ³•å˜é‡
 	class GramRule {
 	public:
-		std::pair<int, std::string> left;				// ×ó²¿
-		std::vector<std::pair<int, std::string>> right;	// ÓÒ²¿
+		std::pair<int, std::string> left;				// å·¦éƒ¨
+		std::vector<std::pair<int, std::string>> right;	// å³éƒ¨
 		GramRule(std::pair<int, std::string> a, std::vector<std::pair<int, std::string>>b) :left(a), right(b) {}
 		GramRule() {
 			left = std::pair<int, std::string>();
@@ -42,7 +42,7 @@ public:
 				return a.left < input.left;
 		}
 	};
-	// ÓĞ×´Ì¬µÄÓï·¨±äÁ¿
+	// æœ‰çŠ¶æ€çš„è¯­æ³•å˜é‡
 	class statusGram {
 	public:
 		int status;
@@ -60,12 +60,12 @@ public:
 			else return a.status < input.status;
 		}
 	};
-	// Ïî¼¯
+	// é¡¹é›†
 	class item {
 	public:
 		int status;
 		std::set<AnalysisTable::statusGram> grams;
-		// ÏàµÈÖØÔØ
+		// ç›¸ç­‰é‡è½½
 		friend bool operator == (const AnalysisTable::item &input, const AnalysisTable::item &a) {
 			return a.grams == input.grams;
 		}
@@ -76,52 +76,52 @@ public:
 				return a.status < input.status;
 		}
 	};
-	// Ïî¼¯×å
+	// é¡¹é›†æ—
 	std::set<AnalysisTable::item> itemSet;
-	// Ô´Óï·¨¹æÔò
+	// æºè¯­æ³•è§„åˆ™
 	std::map<int, GramRule> realGram;
 	// <summary>
 	// AnalysisTable
 	// map
-	//  - int: ×´Ì¬ºÅ
-	//  - SingleLine: Ò»ĞĞµÄ½á¹¹
-	//		- t_action£ºACTION
+	//  - int: çŠ¶æ€å·
+	//  - SingleLine: ä¸€è¡Œçš„ç»“æ„
+	//		- t_actionï¼šACTION
 	//			- map 
-	//				- std::pair<int, std::string>:ÊäÈëµÄ´Ê·¨·ÖÎöÄÚÈİ£¬·Ç×ÛºÏÊôĞÔ
-	//				- string:¶¯×÷			
-	//		- t_goto£º GOTO
+	//				- std::pair<int, std::string>:è¾“å…¥çš„è¯æ³•åˆ†æå†…å®¹ï¼Œéç»¼åˆå±æ€§
+	//				- string:åŠ¨ä½œ			
+	//		- t_gotoï¼š GOTO
 	//			- map
-	//				- std::pair<int,std::string>:ÊäÈë×ÛºÏÊôĞÔ
-	//				- int:GOTO×´Ì¬
+	//				- std::pair<int,std::string>:è¾“å…¥ç»¼åˆå±æ€§
+	//				- int:GOTOçŠ¶æ€
 	// </summary>
 	std::map<int, AnalysisTable::SingleLine> Table;
-	// Ìî³ätable
+	// å¡«å……table
 	void insertTable();
 
 private:
 	std::set<AnalysisTable::statusGram> closure(std::set<AnalysisTable::statusGram>);
 	std::set<AnalysisTable::statusGram> GOTO(std::set<AnalysisTable::statusGram>, std::pair<int, std::string>);
-	// ÉèÖÃGOTO±í¸ñÄÚÈİ
+	// è®¾ç½®GOTOè¡¨æ ¼å†…å®¹
 	void setGOTO(const int &, const int &, const std::pair<int, std::string> &);
-	// ÉèÖÃActionÏîÄ¿
+	// è®¾ç½®Actioné¡¹ç›®
 	void setAction(const std::string &, const int &, const std::pair<int, std::string> &);
-	// Ñ°ÕÒitemÏîÄ¿
+	// å¯»æ‰¾itemé¡¹ç›®
 	int findItem(const std::set<AnalysisTable::statusGram> &);
-	// ·µ»Øfirst¼¯ºÏ
+	// è¿”å›firsté›†åˆ
 	std::set<std::pair<int, std::string>> FIRST(const std::pair<int, std::string>&);
 	std::set<std::pair<int, std::string>> FIRST(const std::vector<std::pair<int, std::string>>&);
-	// ·µ»Øfollow¼¯ºÏ
+	// è¿”å›followé›†åˆ
 	std::set<std::pair<int, std::string>> FOLLOW(const std::pair<int, std::string>&);
-	// first¼¯ºÏ
+	// firsté›†åˆ
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FIRSTSet;
-	// follow¼¯ºÏ
+	// followé›†åˆ
 	std::map<std::pair<int, std::string>, std::set<std::pair<int, std::string>>> FOLLOWSet;
 	std::ofstream *outf;
 public:
-	// ÉèÖÃÓï·¨·ÖÎö±í
+	// è®¾ç½®è¯­æ³•åˆ†æè¡¨
 	void setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>&, std::ofstream *);
 private:
-	// ÎÄ¼şÊä³ö
+	// æ–‡ä»¶è¾“å‡º
 	void printToFile();
 };
 

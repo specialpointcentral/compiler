@@ -1,5 +1,4 @@
-#include "TokenList.h"
-
+ï»¿#include "TokenList.h"
 
 TokenList::TokenList()
 {
@@ -11,7 +10,7 @@ TokenList::~TokenList()
 }
 
 
-// Ôö¼ÓToken
+// å¢žåŠ Token
 void TokenList::Toke(int type,std::string value="")
 {
 	std::pair<int, std::string> token;
@@ -22,7 +21,7 @@ void TokenList::Toke(int type,std::string value="")
 
 
 
-// µÃµ½ÏÂÒ»¸öToken
+// å¾—åˆ°ä¸‹ä¸€ä¸ªToken
 std::pair<int, std::string> TokenList::getNextTokne()
 {
 	if (pos < tokenList.size()) {
@@ -31,7 +30,7 @@ std::pair<int, std::string> TokenList::getNextTokne()
 	else
 		return std::pair<int, std::string>(END,"$");
 }
-// posÏÂÒÆ£¬Ô½½ç·µ»Øfalse
+// posä¸‹ç§»ï¼Œè¶Šç•Œè¿”å›žfalse
 bool TokenList::posNext() {
 	this->pos++;
 	return (pos <= tokenList.size());

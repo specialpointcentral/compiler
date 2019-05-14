@@ -1,7 +1,8 @@
-#include "AnalysisTable.h"
+ï»¿#include "AnalysisTable.h"
 
 AnalysisTable::AnalysisTable()
 {
+	this->outf = nullptr;
 }
 
 AnalysisTable::~AnalysisTable()
@@ -14,18 +15,18 @@ std::set<AnalysisTable::statusGram> AnalysisTable::closure(std::set<AnalysisTabl
 	int inputFlag;
 	do {
 		inputFlag = false;
-		// J ÖĞµÄÃ¿¸öÏî
+		// J ä¸­çš„æ¯ä¸ªé¡¹
 		for (auto J_it = J.begin(); J_it != J.end(); ++J_it) {
 			if (J_it->gramRule.right.size() == J_it->status) continue;
 			std::pair<int, std::string> nextLex = J_it->gramRule.right[J_it->status];
 			if (nextLex.first == BODER) {
-				// ÊÇ·ÇÖÕ½á·û£¬×¼±¸¼ÓÈëÆäËü²¿·Ö
+				// æ˜¯éç»ˆç»“ç¬¦ï¼Œå‡†å¤‡åŠ å…¥å…¶å®ƒéƒ¨åˆ†
 				for (int j = 0; j < realGram.size(); ++j) {
-					// ÕÒµ½¼ÓÈëµÄ¶«Î÷
+					// æ‰¾åˆ°åŠ å…¥çš„ä¸œè¥¿
 					if (realGram[j].left == nextLex) {
-						// ¿ÉÄÜ¿ÉÒÔ¼ÓÈë
+						// å¯èƒ½å¯ä»¥åŠ å…¥
 						if (J.find(statusGram(0, realGram[j])) == J.end()) {
-							// ¼ÓÈë
+							// åŠ å…¥
 							inputFlag = true;
 							J.insert(statusGram(0, realGram[j]));
 						}
@@ -46,10 +47,10 @@ std::set<AnalysisTable::statusGram> AnalysisTable::GOTO(std::set<AnalysisTable::
 		// x->x.
 		if (I_it->gramRule.right.size() <= I_it->status) continue;
 		// else
-		if (I_it->gramRule.right[I_it->status] == X || //Õë¶ÔINT10ºÍID
+		if (I_it->gramRule.right[I_it->status] == X || //é’ˆå¯¹INT10å’ŒID
 			((I_it->gramRule.right[I_it->status].first == ID || I_it->gramRule.right[I_it->status].first == INT10) &&
 				I_it->gramRule.right[I_it->status].first == X.first)) {
-			// ¼ÓÈë¼¯×å
+			// åŠ å…¥é›†æ—
 			AnalysisTable::statusGram tmp = *I_it;
 			tmp.status++;
 			J.insert(tmp);
@@ -59,11 +60,11 @@ std::set<AnalysisTable::statusGram> AnalysisTable::GOTO(std::set<AnalysisTable::
 }
 
 
-// Ìî³ätable
+// å¡«å……table
 void AnalysisTable::insertTable()
 {
-	// ²»Ê×ÏÈÊ¹ÓÃÏî¼¯×å
-	// µÚÒ»²½£¬´´Ôì0Ïî¼¯
+	// ä¸é¦–å…ˆä½¿ç”¨é¡¹é›†æ—
+	// ç¬¬ä¸€æ­¥ï¼Œåˆ›é€ 0é¡¹é›†
 	item set0;
 	set0.status = 0;
 	AnalysisTable::GramRule tmp;
@@ -74,16 +75,16 @@ void AnalysisTable::insertTable()
 	tmps.insert(AnalysisTable::statusGram(0, AnalysisTable::GramRule(tmp)));
 	set0.grams = closure(tmps);
 	AnalysisTable::itemSet.insert(set0);
-	// ¿ªÊ¼Öğ²½·ÖÎö
+	// å¼€å§‹é€æ­¥åˆ†æ
 	int beforeflag;
 	do {
 		beforeflag = this->itemSet.size();
-		// ¶ÔËùÓĞµÄÏî¼¯·ÖÎö
+		// å¯¹æ‰€æœ‰çš„é¡¹é›†åˆ†æ
 		for (auto C_it = AnalysisTable::itemSet.begin(); C_it != AnalysisTable::itemSet.end(); ++C_it) {
-			// Ïî¼¯ÀïÃ¿¸öÎÄ·¨µÄºóÒ»¸öÔªËØ
+			// é¡¹é›†é‡Œæ¯ä¸ªæ–‡æ³•çš„åä¸€ä¸ªå…ƒç´ 
 			for (auto X_it = C_it->grams.begin(); X_it != C_it->grams.end(); ++X_it) {
-				// ´ËÊ±µÄ×´Ì¬ C_it->status;
-				// ¶ÔÓÚ¿Õ´®£¬ºÍ¹æÔ¼Ïî
+				// æ­¤æ—¶çš„çŠ¶æ€ C_it->status;
+				// å¯¹äºç©ºä¸²ï¼Œå’Œè§„çº¦é¡¹
 				if (X_it->gramRule.right.size() <= X_it->status || (X_it->gramRule.right.size() == 1 && X_it->gramRule.right[0].first == EMPTY)) {
 					// x->x.
 					if (X_it->gramRule.right[X_it->gramRule.right.size() - 1].second == BEGINITEM) {
@@ -91,10 +92,10 @@ void AnalysisTable::insertTable()
 						setAction("acc", C_it->status, std::pair<int, std::string>(END, "$"));
 					}
 					else {
-						// x->x. SLR·ÖÎö·¨
-						// Ö´ĞĞ¹éÔ¼²Ù×÷
+						// x->x. SLRåˆ†ææ³•
+						// æ‰§è¡Œå½’çº¦æ“ä½œ
 						auto followSet = AnalysisTable::FOLLOW(X_it->gramRule.left);
-						int index;
+						int index = 0;
 						for (auto itor = realGram.begin(); itor != realGram.end(); ++itor) {
 							if (itor->second == X_it->gramRule) {
 								index = itor->first;
@@ -105,7 +106,7 @@ void AnalysisTable::insertTable()
 						ss << "r" << index;
 						std::string tmp;
 						ss >> tmp;
-						// ËùÓĞµÄ·Å½øÈ¥
+						// æ‰€æœ‰çš„æ”¾è¿›å»
 						for (auto it = followSet.begin(); it != followSet.end(); ++it) {
 							AnalysisTable::setAction(tmp, C_it->status, *it);
 						}
@@ -136,27 +137,27 @@ void AnalysisTable::insertTable()
 	this->printToFile();
 }
 
-// ÉèÖÃGOTO±í¸ñÄÚÈİ
+// è®¾ç½®GOTOè¡¨æ ¼å†…å®¹
 void AnalysisTable::setGOTO(const int &setT, const int &i, const std::pair<int, std::string> &B)
 {
 	this->Table[i].t_goto.gotoMap[B] = setT;
 }
 
-// ÉèÖÃActionÏîÄ¿
+// è®¾ç½®Actioné¡¹ç›®
 void AnalysisTable::setAction(const std::string &setT, const int &i, const std::pair<int, std::string> &a)
 {
 	this->Table[i].t_action.actionMap[a] = setT;
 }
 
 
-// Ñ°ÕÒitemÏîÄ¿
+// å¯»æ‰¾itemé¡¹ç›®
 int AnalysisTable::findItem(const std::set<AnalysisTable::statusGram> &item)
 {
-	// Ñ°ÕÒÏàÓ¦µÄ×´Ì¬
+	// å¯»æ‰¾ç›¸åº”çš„çŠ¶æ€
 	for (auto it = this->itemSet.begin(); it != this->itemSet.end(); ++it) {
 		if (it->grams == item) return it->status;
 	}
-	// Èç¹ûÃ»ÓĞÔò´´½¨
+	// å¦‚æœæ²¡æœ‰åˆ™åˆ›å»º
 	AnalysisTable::item tmp;
 	tmp.status = this->itemSet.size();
 	tmp.grams = item;
@@ -164,18 +165,18 @@ int AnalysisTable::findItem(const std::set<AnalysisTable::statusGram> &item)
 	return tmp.status;
 }
 
-// ·µ»Øfirst¼¯ºÏ
+// è¿”å›firsté›†åˆ
 std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, std::string> &input)
 {
 	if (input.first != BODER) {
-		// ÖÕ½á·û
+		// ç»ˆç»“ç¬¦
 		std::set<std::pair<int, std::string>> first;
 		first.insert(input);
 		return first;
 	}
 	else {
 		if (this->FIRSTSet.size() != 0) {
-			// ËµÃ÷ÒÑ¾­¹¹½¨¹ıÁË
+			// è¯´æ˜å·²ç»æ„å»ºè¿‡äº†
 			return this->FIRSTSet[input];
 		}
 		int before, next;
@@ -184,24 +185,24 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, 
 			for (auto i = FIRSTSet.begin(); i != FIRSTSet.end(); ++i) {
 				before += i->second.size();
 			}
-			// Íâ²ãÕû¸öÓï·¨±éÀú
+			// å¤–å±‚æ•´ä¸ªè¯­æ³•éå†
 			for (auto it = realGram.begin(); it != realGram.end(); ++it) {
-				// ÄÚ²ã½øĞĞ±éÀú
+				// å†…å±‚è¿›è¡Œéå†
 				std::pair<int, std::string> left = it->second.left;
 				std::pair<int, std::string> right = it->second.right[0];
 				if (right.first == BODER) {
-					// ²éÕÒÀïÃæ
+					// æŸ¥æ‰¾é‡Œé¢
 					for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
-						// ÊÇ·ÇÖÕ½á·û£¬¼ÓÈë
+						// æ˜¯éç»ˆç»“ç¬¦ï¼ŒåŠ å…¥
 						auto tmp = FIRSTSet[right];
-						// È¥³ı¿Õ
+						// å»é™¤ç©º
 						FIRSTSet[left].erase(std::pair<int, std::string>(EMPTY, ""));
 						FIRSTSet[left].insert(tmp.begin(), tmp.end());
-						// ÓĞ¿Õ´®
+						// æœ‰ç©ºä¸²
 						if (FIRSTSet[right].find(std::pair<int, std::string>(EMPTY, "")) != FIRSTSet[right].end()) {
-							// ÊÇ×îºóÒ»¸ö
+							// æ˜¯æœ€åä¸€ä¸ª
 							if (p + 1 == it->second.right.end()) {
-								// ¼ÓÈë¿Õ´®
+								// åŠ å…¥ç©ºä¸²
 								FIRSTSet[right].insert(std::pair<int, std::string>(EMPTY, ""));
 							}
 						}
@@ -209,7 +210,7 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, 
 					}
 				}
 				else {
-					// ÖÕ½á·û¼ÓÈë
+					// ç»ˆç»“ç¬¦åŠ å…¥
 					FIRSTSet[left].insert(right);
 				}
 			}
@@ -219,25 +220,25 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::pair<int, 
 			}
 		} while (before != next);
 	}
-	// ÕÒfirst¼¯ºÏ
+	// æ‰¾firsté›†åˆ
 	return FIRSTSet[input];
 }
 std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::vector<std::pair<int, std::string>> &input) {
 	std::set<std::pair<int, std::string>> tmp;
 	for (auto it = input.begin(); it != input.end(); ++it) {
-		// ´ËÊ±ÊÇ²»ÊÇÖÕ½á·û
+		// æ­¤æ—¶æ˜¯ä¸æ˜¯ç»ˆç»“ç¬¦
 		if (it->first != BODER) {
 			tmp.insert(*it);
 			break;
 		}
-		// ×îºóÒ»¸ö
+		// æœ€åä¸€ä¸ª
 		std::set<std::pair<int, std::string>> p = FIRST(*it);
 		if (it + 1 == input.end()) {
 			tmp.insert(p.begin(), p.end());
 		}
 		else {
 			if (p.find(std::pair<int, std::string>(EMPTY, "")) != p.end()) {
-				// ÓĞ¿Õ´®
+				// æœ‰ç©ºä¸²
 				p.erase(std::pair<int, std::string>(EMPTY, ""));
 				tmp.insert(p.begin(), p.end());
 			}
@@ -250,14 +251,14 @@ std::set<std::pair<int, std::string>> AnalysisTable::FIRST(const std::vector<std
 	return tmp;
 }
 
-// ·µ»Øfollow¼¯ºÏ
+// è¿”å›followé›†åˆ
 std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int, std::string> &input)
 {
 	if (this->FOLLOWSet.size() != 0) {
-		// ËµÃ÷ÒÑ¾­¹¹½¨¹ıÁË
+		// è¯´æ˜å·²ç»æ„å»ºè¿‡äº†
 		return this->FOLLOWSet[input];
 	}
-	// ¼ÓÈë$
+	// åŠ å…¥$
 	FOLLOWSet[std::pair<int, std::string>(BODER, BEGINITEM)].insert(std::pair<int, std::string>(END, "$"));
 	int before, next;
 	do {
@@ -265,14 +266,14 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int,
 		for (auto i = FOLLOWSet.begin(); i != FOLLOWSet.end(); ++i) {
 			before += i->second.size();
 		}
-		// Íâ²ãÕû¸öÓï·¨±éÀú
+		// å¤–å±‚æ•´ä¸ªè¯­æ³•éå†
 		for (auto it = realGram.begin(); it != realGram.end(); ++it) {
-			// ÄÚ²¿Ò»²ã±éÀúËùÓĞÓÒ±ß±äÁ¿
+			// å†…éƒ¨ä¸€å±‚éå†æ‰€æœ‰å³è¾¹å˜é‡
 			for (auto p = it->second.right.begin(); p != it->second.right.end(); ++p) {
 				if (p->first != BODER) continue;
-				// p´ú±íÁËpµÄfollow
+				// pä»£è¡¨äº†pçš„follow
 				bool hasEmpty = false;
-				if (p + 1 != it->second.right.end()) {	// ²»ÊÇ×îºóÒ»¸ö
+				if (p + 1 != it->second.right.end()) {	// ä¸æ˜¯æœ€åä¸€ä¸ª
 					std::set<std::pair<int, std::string>> first = this->FIRST(std::vector<std::pair<int, std::string>>(p + 1, it->second.right.end()));
 					if (hasEmpty = (first.find(std::pair<int, std::string>(EMPTY, "")) != first.end())) {
 						first.erase(std::pair<int, std::string>(EMPTY, ""));
@@ -294,7 +295,7 @@ std::set<std::pair<int, std::string>> AnalysisTable::FOLLOW(const std::pair<int,
 }
 
 
-// ÉèÖÃÓï·¨·ÖÎö±í
+// è®¾ç½®è¯­æ³•åˆ†æè¡¨
 void AnalysisTable::setRealGram(const std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input, std::ofstream *outf)
 {
 	for (int i = 0; i < input.size(); ++i) {
@@ -305,10 +306,10 @@ void AnalysisTable::setRealGram(const std::vector<std::pair<std::pair<int, std::
 
 
 
-// ÎÄ¼şÊä³ö
+// æ–‡ä»¶è¾“å‡º
 void AnalysisTable::printToFile()
 {
-	// Êä³öfirst
+	// è¾“å‡ºfirst
 	*outf << "### Grammar Analysis" << std::endl;
 	*outf << "#### First Table" << std::endl;
 	*outf << "| First |  |" << std::endl;
@@ -320,7 +321,7 @@ void AnalysisTable::printToFile()
 		}
 		*outf << " |" << std::endl;
 	}
-	// Êä³öfollow
+	// è¾“å‡ºfollow
 	*outf << "#### Follow Table" << std::endl;
 	*outf << "| Follow |  |" << std::endl;
 	*outf << "|---|---|" << std::endl;
@@ -331,7 +332,7 @@ void AnalysisTable::printToFile()
 		}
 		*outf << " |" << std::endl;
 	}
-	// Êä³öÔ­Ê¼µÄÓï·¨
+	// è¾“å‡ºåŸå§‹çš„è¯­æ³•
 	*outf << "#### Grammar Table" << std::endl;
 	*outf << "| # | Left | Right |" << std::endl;
 	*outf << "|---|---|---|" << std::endl;
@@ -342,14 +343,14 @@ void AnalysisTable::printToFile()
 		}
 		*outf << " |" << std::endl;
 	}
-	// Êä³ö×´Ì¬×ª»»
+	// è¾“å‡ºçŠ¶æ€è½¬æ¢
 	*outf << "#### Transfer Machine" << std::endl;
 	for (auto s = this->itemSet.begin(); s != this->itemSet.end(); ++s) {
 		*outf << "| Status:" << s->status << " | Left | Right |" << std::endl;
 		*outf << "|---|---|---|" << std::endl;
 		for (auto it = s->grams.begin(); it != s->grams.end(); ++it) {
 			*outf << "| " << it->status << " | < " << it->gramRule.left.first << " , " << it->gramRule.left.second << " > |";
-			int count = 0;	// Î»ÖÃ¶¨Î»
+			int count = 0;	// ä½ç½®å®šä½
 			for (auto p = it->gramRule.right.begin(); p != it->gramRule.right.end(); ++p) {
 				if (count == it->status) *outf << ".";
 				*outf << " < " << p->first << ", " << p->second << " >";
@@ -361,9 +362,9 @@ void AnalysisTable::printToFile()
 		*outf << std::endl;
 	}
 
-	// Êä³ö×´Ì¬±í
+	// è¾“å‡ºçŠ¶æ€è¡¨
 	*outf << "#### Transfer Table" << std::endl;
-	// Í³¼ÆËùÓĞ×´Ì¬
+	// ç»Ÿè®¡æ‰€æœ‰çŠ¶æ€
 	std::set<std::pair<int, std::string>> t_action, t_goto;
 	for (auto p = this->Table.begin(); p != this->Table.end(); ++p) {
 		for (auto it = p->second.t_action.actionMap.begin(); it != p->second.t_action.actionMap.end(); ++it) {
@@ -374,7 +375,7 @@ void AnalysisTable::printToFile()
 		}
 	}
 	*outf << "<table>" << std::endl;
-	// Êä³ö±íÍ·
+	// è¾“å‡ºè¡¨å¤´
 	*outf << "<tr>" << std::endl
 		<< "<th rowspan=\"2\"> # </th>" << std::endl
 		<< "<th colspan=\"" << t_action.size() << "\">ACTION</th>" << std::endl
@@ -388,7 +389,7 @@ void AnalysisTable::printToFile()
 		*outf << "<th>< " << it->first << " , " << it->second << " ></th>" << std::endl;
 	}
 	*outf << "</tr>" << std::endl;
-	// °´ĞĞÊä³ö
+	// æŒ‰è¡Œè¾“å‡º
 	for (auto p = this->Table.begin(); p != this->Table.end(); ++p) {
 		*outf << "<tr>" << std::endl;
 		*outf << "<td>" << p->first << "</td>" << std::endl;

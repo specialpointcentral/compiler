@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "headerInclude.h"
 
 class TokenList
@@ -9,12 +9,12 @@ public:
 	TokenList();
 	~TokenList();
 	
-	// Ôö¼ÓToken
+	// å¢åŠ Token
 	void Toke(int, std::string);
 
-	// µÃµ½ÏÂÒ»¸öToken
+	// å¾—åˆ°ä¸‹ä¸€ä¸ªToken
 	std::pair<int, std::string> getNextTokne();
-	// posÏÂÒÆ
+	// posä¸‹ç§»
 	bool posNext();
 };
 

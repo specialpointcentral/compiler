@@ -4,19 +4,21 @@
 #include "pch.h"
 #include "headerInclude.h"
 #include "LexAnalyse.h"
-#include "GrammerAnalysis.h"
+#include "SyntaxAnalysis.h"
+#include "EnvTable.h"
 
 using namespace std;
 
 ifstream inf;
 ofstream outf;
-TokenList tokenList = TokenList();
+TokenList tokenList;
 AnalysisTable analysisTable = AnalysisTable();
 std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> gramRule;
+EnvTable envTable;
 
 void spiltArray(const string&, vector<string>&, const string&);
-std::pair<int, std::string> getPair(const std::string &);
-bool readGram(const std::string &, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &);
+std::pair<int, std::string> getPair(const std::string&);
+bool readGram(const std::string&, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>&);
 
 int main()
 {
@@ -33,7 +35,9 @@ int main()
 	cout << "Open gram file:";
 	cin >> filename;
 	readGram(filename, gramRule);
-	outf.open("d://desktop//out.md", ios::out);
+	cout << "Output file:";
+	cin >> filename;
+	outf.open(filename, ios::out);
 	if (!outf.is_open()) {
 		cout << "Unable to open the output file. " << endl;
 		cout << "Press any key to continue.." << endl;
@@ -48,6 +52,7 @@ int main()
 	// 词法分析
 	LexAnalyse lex = LexAnalyse(input, &outf);
 	lex.setTokenList(&tokenList);
+	lex.setEnvTable(&envTable);
 	lex.lexAnalysic();
 	// 词法分析-错误处理
 	if (lex.hasError()) {
@@ -86,14 +91,14 @@ int main()
 	analysisTable.setRealGram(gramRule, &outf);
 	analysisTable.insertTable();
 	// 进行语法分析
-	GrammerAnalysis gram = GrammerAnalysis(&tokenList, &analysisTable);
+	SyntaxAnalysis gram = SyntaxAnalysis(&tokenList, &analysisTable);
 	gram.beginAnalysis();
 	// 进行语法制导的语义翻译
 
 	return 0;
 }
 
-bool readGram(const std::string &inputFile, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> &input) {
+bool readGram(const std::string& inputFile, std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>>& input) {
 	ifstream inf;
 	inf.open(inputFile, ios::in);
 	if (!inf.is_open()) {
@@ -140,7 +145,7 @@ void spiltArray(const string& s, vector<string>& v, const string& c) {
 	if (pos1 != s.length())
 		v.push_back(s.substr(pos1));
 }
-std::pair<int, std::string> getPair(const std::string &input) {
+std::pair<int, std::string> getPair(const std::string & input) {
 	std::string tmp = input.substr(1, input.size() - 2);
 	std::vector<std::string> split;
 	spiltArray(tmp, split, ",");

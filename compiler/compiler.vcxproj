@@ -23,19 +23,19 @@
     <ProjectGuid>{8DC4B0BB-966E-4C61-A205-FC2B5B1571B8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>compiler</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -151,7 +151,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnalysisTable.h" />
-    <ClInclude Include="GrammerAnalysis.h" />
+    <ClInclude Include="EnvTable.h" />
+    <ClInclude Include="SyntaxAnalysis.h" />
     <ClInclude Include="headerInclude.h" />
     <ClInclude Include="LexAnalyse.h" />
     <ClInclude Include="pch.h" />
@@ -160,7 +161,8 @@
   <ItemGroup>
     <ClCompile Include="AnalysisTable.cpp" />
     <ClCompile Include="compiler.cpp" />
-    <ClCompile Include="GrammerAnalysis.cpp" />
+    <ClCompile Include="EnvTable.cpp" />
+    <ClCompile Include="SyntaxAnalysis.cpp" />
     <ClCompile Include="LexAnalyse.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

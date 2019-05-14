@@ -27,10 +27,13 @@
     <ClInclude Include="TokenList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GrammerAnalysis.h">
+    <ClInclude Include="AnalysisTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AnalysisTable.h">
+    <ClInclude Include="SyntaxAnalysis.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,10 +50,13 @@
     <ClCompile Include="TokenList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GrammerAnalysis.cpp">
+    <ClCompile Include="AnalysisTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AnalysisTable.cpp">
+    <ClCompile Include="SyntaxAnalysis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EnvTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

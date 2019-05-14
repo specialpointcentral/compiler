@@ -1,6 +1,7 @@
-#pragma once
+ï»¿#pragma once
 #include "headerInclude.h"
 #include "TokenList.h"
+#include "EnvTable.h"
 
 class LexAnalyse
 {
@@ -13,7 +14,7 @@ public:
 	};
 	LexAnalyse(std::vector<std::string>,std::ofstream *);
 	~LexAnalyse();
-	// ´Ê·¨·ÖÎöº¯Êı
+	// è¯æ³•åˆ†æå‡½æ•°
 	bool lexAnalysic();
 private:
 	std::vector<std::string> op = { "+","-","*","/",">","<","=","(",")",";","'","==",">=","<=","!=" };
@@ -22,27 +23,33 @@ private:
 	std::vector<LexAnalyse::errors> errorStack;
 	TokenList *tokenList;
 	std::ofstream *outf;
-	// ÊÇ·ñÊÇ×ÖÄ¸
+	// æ˜¯å¦æ˜¯å­—æ¯
 	bool isLetter(char);
-	// ÊÇ·ñÊÇÊı×Ö
+	// æ˜¯å¦æ˜¯æ•°å­—
 	bool isNumber(char);
-	// ÅĞ¶ÏÊÇ·ñÊÇOP
+	// åˆ¤æ–­æ˜¯å¦æ˜¯OP
 	bool isOp(std::string);
 	bool isOp(char);
-	// ÊÇ·ñÊÇ¹Ø¼ü×Ö
+	// æ˜¯å¦æ˜¯å…³é”®å­—
 	bool isKeyword(std::string);
 public:
-	// µÃµ½LexToken±í
+	// å¾—åˆ°LexTokenè¡¨
 	std::vector<std::pair<int, std::string>> getTokenTable();
 private:
-	// ´¦Àí·ÖÎöerror
+	// å¤„ç†åˆ†æerror
 	void error(std::string, int, int, int);
 public:
-	// ÉèÖÃTokenList
+	// è®¾ç½®TokenList
 	void setTokenList(TokenList*);
-	// ÅĞ¶ÏÊÇ·ñÓĞ´íÎóĞèÒª´¦Àí
+	// åˆ¤æ–­æ˜¯å¦æœ‰é”™è¯¯éœ€è¦å¤„ç†
 	bool hasError();
-	// »ñÈ¡´íÎóÊı¾İ
+	// è·å–é”™è¯¯æ•°æ®
 	std::vector<LexAnalyse::errors> getError();
+private:
+	// ç¬¦å·è¡¨
+	EnvTable* envTable;
+public:
+	// è®¾ç½®ç¬¦å·è¡¨
+	void setEnvTable(EnvTable*);
 };
 

@@ -1,11 +1,12 @@
-#include "LexAnalyse.h"
+ï»¿#include "LexAnalyse.h"
 
-// ³õÊ¼»¯´Ê·¨·ÖÎöÆ÷£¬Ã¿Ò»ĞĞ×°ÈëÒ»¸övectorÀï
+// åˆå§‹åŒ–è¯æ³•åˆ†æå™¨ï¼Œæ¯ä¸€è¡Œè£…å…¥ä¸€ä¸ªvectoré‡Œ
 LexAnalyse::LexAnalyse(std::vector<std::string> inputLex, std::ofstream *outf)
 {
 	this->inputLex = inputLex;
 	this->tokenList = nullptr;
 	this->outf = outf;
+	this->envTable = nullptr;
 }
 
 LexAnalyse::~LexAnalyse()
@@ -13,41 +14,42 @@ LexAnalyse::~LexAnalyse()
 
 }
 
-// ´Ê·¨·ÖÎöº¯Êı
+// è¯æ³•åˆ†æå‡½æ•°
 bool LexAnalyse::lexAnalysic()
 {
 	for (int line = 0; line < inputLex.size(); ++line) {
 		std::string hintLine = inputLex[line];
 		for (int pos = 0, lastPos = 0; pos < hintLine.size(); ++pos, lastPos = pos) {
 			if (isLetter(hintLine[pos])) {
-				// ¶ÔÓÚÊÇ×ÖÄ¸¿ªÍ·£¬¿¼ÂÇ 1-keyword,2-id
-				// ½«ËùÓĞµÄletterºÍnumberÈ«²¿Åª½øÈ¥
+				// å¯¹äºæ˜¯å­—æ¯å¼€å¤´ï¼Œè€ƒè™‘ 1-keyword,2-id
+				// å°†æ‰€æœ‰çš„letterå’Œnumberå…¨éƒ¨å¼„è¿›å»
 				while (pos < hintLine.size() && (isLetter(hintLine[++pos]) || isNumber(hintLine[pos])));
-				if (pos == hintLine.size()) --pos; // Òç³ö
+				if (pos == hintLine.size()) --pos; // æº¢å‡º
 				else if (!isLetter(hintLine[pos]) && !isNumber(hintLine[pos])) --pos;
-				// ÅĞ¶ÏÊÇ²»ÊÇkeyword
+				// åˆ¤æ–­æ˜¯ä¸æ˜¯keyword
 				if (isKeyword(hintLine.substr(lastPos, pos - lastPos + 1))) {
-					// ¼ÓÈëkeyword
+					// åŠ å…¥keyword
 					// std::cout << "keyword\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(KEYWORDS, hintLine.substr(lastPos, pos - lastPos + 1));
 				}
 				else {
-					// ¼ÓÈëid
+					// åŠ å…¥id
 					// std::cout << "id\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(ID, hintLine.substr(lastPos, pos - lastPos + 1));
+					envTable->createItem(std::make_pair(ID, hintLine.substr(lastPos, pos - lastPos + 1)));
 				}
 
 			}
 			else if (isNumber(hintLine[pos])) {
-				// ¶ÔÓÚÊÇÊı×Ö¿ªÍ·£¬¿¼ÂÇ 1-int10,2-error
+				// å¯¹äºæ˜¯æ•°å­—å¼€å¤´ï¼Œè€ƒè™‘ 1-int10,2-error
 				while (pos < hintLine.size() && isNumber(hintLine[++pos]));
-				if (pos == hintLine.size()) --pos; // Òç³ö
+				if (pos == hintLine.size()) --pos; // æº¢å‡º
 				if (!isNumber(hintLine[pos])) --pos;
 				if (isLetter(hintLine[pos + 1])) {
 					// error
-					// ¿Ö»Å´¦Àí£¬ÅÜÍêËùÓĞletterºÍnumber
+					// ææ…Œå¤„ç†ï¼Œè·‘å®Œæ‰€æœ‰letterå’Œnumber
 					while (pos < hintLine.size() && (isLetter(hintLine[++pos]) || isNumber(hintLine[pos])));
-					if (pos == hintLine.size()) --pos; // Òç³ö
+					if (pos == hintLine.size()) --pos; // æº¢å‡º
 					else if (!isLetter(hintLine[pos]) && !isNumber(hintLine[pos])) --pos;
 
 					error(hintLine, line + 1, lastPos, pos);
@@ -55,45 +57,45 @@ bool LexAnalyse::lexAnalysic()
 				}
 				else {
 					// int10
-					// ¼ÓÈëint10
+					// åŠ å…¥int10
 					// std::cout << "int10\t" << hintLine.substr(lastPos, pos - lastPos + 1) << std::endl;
 					tokenList->Toke(INT10, hintLine.substr(lastPos, pos - lastPos + 1));
+					envTable->createItem(std::make_pair(INT10, hintLine.substr(lastPos, pos - lastPos + 1)));
 				}
 			}
 			else if (isOp(hintLine[pos])) {
-				// ¶ÔÓÚÊÇopµÄ£¬¿¼ÂÇ 1-only,2-double
+				// å¯¹äºæ˜¯opçš„ï¼Œè€ƒè™‘ 1-only,2-double
 				if (isOp(hintLine.substr(lastPos, 2))) {
-					// ¼ÓÈëÁ½¸öµÄ hintLine.substr(lastPos, 2)
+					// åŠ å…¥ä¸¤ä¸ªçš„ hintLine.substr(lastPos, 2)
 					// std::cout << "op\t" << hintLine.substr(lastPos, 2) << std::endl;
 					tokenList->Toke(OP, hintLine.substr(lastPos, 2));
 					++pos;
 				}
 				else {
-					// ¼ÓÈëÒ»¸öµÄ
+					// åŠ å…¥ä¸€ä¸ªçš„
 					// std::cout << "op\t" << hintLine.substr(lastPos, 1) << std::endl;
 					tokenList->Toke(OP, hintLine.substr(lastPos, 1));
 				}
 			}
 			else if (hintLine[pos] == ' ') {
-				// ¶ªµôÆäËû¿Õ¸ñ
+				// ä¸¢æ‰å…¶ä»–ç©ºæ ¼
 				while (pos < hintLine.size() && hintLine[++pos] == ' ');
-				if (pos == hintLine.size()) --pos; // Òç³ö
+				if (pos == hintLine.size()) --pos; // æº¢å‡º
 				else if (!(hintLine[pos] == ' ')) --pos;
 			}
 			else {
-				// TODO ³ö´í
+				// TODO å‡ºé”™
 				++pos;
 				error(hintLine, line + 1, lastPos, pos);
 			}
 		}
 	}
-	*outf << "Lex Analysis Complete!" << std::endl;
 	std::cout << "Lex Analysis Complete!" << std::endl;
 	return true;
 }
 
 
-// ÊÇ·ñÊÇ×ÖÄ¸
+// æ˜¯å¦æ˜¯å­—æ¯
 bool LexAnalyse::isLetter(char i)
 {
 	if ((i >= 'a' && i <= 'z') || (i >= 'A' && i <= 'Z')) {
@@ -103,7 +105,7 @@ bool LexAnalyse::isLetter(char i)
 }
 
 
-// ÊÇ·ñÊÇÊı×Ö
+// æ˜¯å¦æ˜¯æ•°å­—
 bool LexAnalyse::isNumber(char i)
 {
 	if ((i >= '0' && i <= '9')) {
@@ -113,7 +115,7 @@ bool LexAnalyse::isNumber(char i)
 }
 
 
-// ÅĞ¶ÏÊÇ·ñÊÇOP
+// åˆ¤æ–­æ˜¯å¦æ˜¯OP
 bool LexAnalyse::isOp(std::string in)
 {
 	for (int i = 0; i < op.size(); ++i) {
@@ -126,7 +128,7 @@ bool LexAnalyse::isOp(std::string in)
 
 bool LexAnalyse::isOp(char in) {
 	for (int i = 0; i < op.size(); ++i) {
-		// ¿¼ÂÇÖ»º¬ÓĞÒ»¸öµÄºÍÁ½¸öµÄ
+		// è€ƒè™‘åªå«æœ‰ä¸€ä¸ªçš„å’Œä¸¤ä¸ªçš„
 		if (in == op[i][0]) {
 			return true;
 		}
@@ -134,7 +136,7 @@ bool LexAnalyse::isOp(char in) {
 	return false;
 }
 
-// ÊÇ·ñÊÇ¹Ø¼ü×Ö
+// æ˜¯å¦æ˜¯å…³é”®å­—
 bool LexAnalyse::isKeyword(std::string in)
 {
 	for (int i = 0; i < keywords.size(); ++i) {
@@ -146,14 +148,14 @@ bool LexAnalyse::isKeyword(std::string in)
 }
 
 
-// µÃµ½LexToken±í
+// å¾—åˆ°LexTokenè¡¨
 std::vector<std::pair<int, std::string>> LexAnalyse::getTokenTable()
 {
 	return this->tokenList->tokenList;
 }
 
 
-// ´¦Àí·ÖÎöerror
+// å¤„ç†åˆ†æerror
 void LexAnalyse::error(std::string line, int lines, int begin, int end)
 {
 	LexAnalyse::errors e;
@@ -172,22 +174,28 @@ void LexAnalyse::error(std::string line, int lines, int begin, int end)
 }
 
 
-// ÉèÖÃTokenList
+// è®¾ç½®TokenList
 void LexAnalyse::setTokenList(TokenList *tokenList)
 {
 	this->tokenList = tokenList;
 }
 
 
-// ÅĞ¶ÏÊÇ·ñÓĞ´íÎóĞèÒª´¦Àí
+// åˆ¤æ–­æ˜¯å¦æœ‰é”™è¯¯éœ€è¦å¤„ç†
 bool LexAnalyse::hasError()
 {
 	return !errorStack.empty();
 }
 
 
-// »ñÈ¡´íÎóÊı¾İ
+// è·å–é”™è¯¯æ•°æ®
 std::vector<LexAnalyse::errors> LexAnalyse::getError()
 {
 	return errorStack;
+}
+
+// è®¾ç½®ç¬¦å·è¡¨
+void LexAnalyse::setEnvTable(EnvTable*  input)
+{
+	this->envTable = input;
 }
