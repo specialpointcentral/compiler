@@ -14,6 +14,7 @@ ofstream outf;
 TokenList tokenList;
 AnalysisTable analysisTable = AnalysisTable();
 std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> gramRule;
+std::map<int, std::string> actionList;
 EnvTable envTable;
 
 void spiltArray(const string&, vector<string>&, const string&);
@@ -91,9 +92,12 @@ int main()
 	analysisTable.setRealGram(gramRule, &outf);
 	analysisTable.insertTable();
 	// 进行语法分析
-	SyntaxAnalysis gram = SyntaxAnalysis(&tokenList, &analysisTable);
-	gram.beginAnalysis();
+	SyntaxAnalysis gram = SyntaxAnalysis(&tokenList, &analysisTable, &envTable);
+	// 添加语义动作
+	gram.setActionList(actionList);
+	gram.setOutput(&outf);
 	// 进行语法制导的语义翻译
+	gram.beginAnalysis();
 
 	return 0;
 }
@@ -121,7 +125,15 @@ bool readGram(const std::string& inputFile, std::vector<std::pair<std::pair<int,
 			std::vector<std::string> p;
 			spiltArray(*it, p, " ");
 			for (auto pt = p.begin(); pt != p.end(); ++pt) {
-				right.push_back(getPair(*pt));
+				auto tmp = getPair(*pt);
+				if (tmp.first == ACTION) {
+					// 语义动作
+					actionList[gramRule.size()] = tmp.second;
+				}
+				else
+				{
+					right.push_back(tmp);
+				}
 			}
 			input.push_back(std::make_pair(left, right));
 			right.clear();
@@ -151,22 +163,25 @@ std::pair<int, std::string> getPair(const std::string & input) {
 	spiltArray(tmp, split, ",");
 	int left;
 	if (split[0] == "KEYWORDS") {
-		left = 1;
+		left = KEYWORDS;
 	}
 	else if (split[0] == "INT10") {
-		left = 2;
+		left = INT10;
 	}
 	else if (split[0] == "ID") {
-		left = 3;
+		left = ID;
 	}
 	else if (split[0] == "OP") {
-		left = 4;
+		left = OP;
 	}
 	else if (split[0] == "BODER") {
-		left = 6;
+		left = BODER;
 	}
 	else if (split[0] == "EMPTY") {
-		left = 7;
+		left = EMPTY;
+	}
+	else if (split[0] == "ACTION") {
+		left = ACTION;
 	}
 	return std::make_pair(left, split.size() == 1 ? "" : split[1]);
 }

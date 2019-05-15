@@ -19,7 +19,7 @@ bool LexAnalyse::lexAnalysic()
 {
 	for (int line = 0; line < inputLex.size(); ++line) {
 		std::string hintLine = inputLex[line];
-		for (int pos = 0, lastPos = 0; pos < hintLine.size(); ++pos, lastPos = pos) {
+		for (std::size_t pos = 0, lastPos = 0; pos < hintLine.size(); ++pos, lastPos = pos) {
 			if (isLetter(hintLine[pos])) {
 				// 对于是字母开头，考虑 1-keyword,2-id
 				// 将所有的letter和number全部弄进去
@@ -91,7 +91,7 @@ bool LexAnalyse::lexAnalysic()
 		}
 	}
 	std::cout << "Lex Analysis Complete!" << std::endl;
-	return true;
+	return true; 
 }
 
 

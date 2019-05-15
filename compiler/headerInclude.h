@@ -16,7 +16,7 @@ constexpr auto OP = 4;
 constexpr auto END = 5;
 constexpr auto BODER = 6;	// 非终结符
 constexpr auto EMPTY = 7;	// 空串
-
+constexpr auto ACTION = 8;	// 语义动作
 
 constexpr auto BEGINITEM = "P";	// 开始符号
 

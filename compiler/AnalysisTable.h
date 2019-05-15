@@ -21,7 +21,7 @@ public:
 		AnalysisTable::Action t_action;
 		AnalysisTable::GOTO t_goto;
 	};
-	// 语法变量
+	// 语法规则项
 	class GramRule {
 	public:
 		std::pair<int, std::string> left;				// 左部
@@ -31,6 +31,7 @@ public:
 			left = std::pair<int, std::string>();
 			right = std::vector<std::pair<int, std::string>>();
 		}
+		GramRule(const AnalysisTable::GramRule &input) :left(input.left), right(input.right) {};
 		friend bool operator == (const AnalysisTable::GramRule &a, const AnalysisTable::GramRule &input) {
 			return a.left == input.left && a.right == input.right;
 		}
@@ -42,11 +43,11 @@ public:
 				return a.left < input.left;
 		}
 	};
-	// 有状态的语法变量
+	// 有状态的语法规则项
 	class statusGram {
 	public:
-		int status;
-		GramRule gramRule;
+		int status;			// 状态
+		GramRule gramRule;	// 语法规则项
 		statusGram(int status, GramRule gramRule) :status(status), gramRule(gramRule) {}
 		friend bool operator == (const AnalysisTable::statusGram &a, const AnalysisTable::statusGram &input) {
 			if (a.status == input.status && a.gramRule == input.gramRule)
@@ -123,5 +124,6 @@ public:
 private:
 	// 文件输出
 	void printToFile();
+
 };
 
