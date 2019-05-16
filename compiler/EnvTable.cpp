@@ -3,6 +3,12 @@
 
 EnvTable::EnvTable()
 {
+	this->outf = nullptr;
+}
+
+EnvTable::EnvTable(std::ofstream* input)
+{
+	this->outf = input;
 }
 
 
@@ -22,7 +28,7 @@ void EnvTable::createItem(std::pair<int, std::string> input)
 		}
 		this->Table[input] = tmp;
 	}
-		
+
 }
 
 
@@ -44,7 +50,7 @@ int EnvTable::getOffset()
 	return this->offset;
 }
 
-bool EnvTable::enter(std::pair<int,std::string> lex, std::string type, int width)
+bool EnvTable::enter(std::pair<int, std::string> lex, std::string type, int width)
 {
 	auto tmp = this->Table.find(lex);
 	if (tmp != this->Table.end()) {
@@ -56,6 +62,23 @@ bool EnvTable::enter(std::pair<int,std::string> lex, std::string type, int width
 			tmp->second.kind = KINDSIMID;	// ¼ò±ä
 		return true;
 	}
-		
+
 	else return false;
+}
+
+void EnvTable::printOut()
+{
+	*outf << "### Env table" << std::endl;
+	*outf << "| Item | size | addr | kind | type | value |" << std::endl;
+	*outf << "| --- | --- | --- | --- | --- | --- |" << std::endl;
+	for (auto it = this->Table.begin(); it != this->Table.end(); ++it) {
+		*outf << "| < " << it->first.first << " , " << it->first.second << " > | "
+			<< it->second.size << " | "
+			<< it->second.addr << " | "
+			<< it->second.kind << " | "
+			<< it->second.type << " | "
+			<< it->second.val << " |"
+			<< std::endl;
+	}
+	*outf << std::endl;
 }

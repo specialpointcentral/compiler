@@ -40,3 +40,6 @@ debug/
 *.suo
 *.user
 *.sln.docstates
+
+#vs code
+.vscode/

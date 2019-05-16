@@ -46,6 +46,7 @@ void SyntaxAnalysis::beginAnalysis()
 			// 通过
 			std::cout << "Grammer Analysis Complete!" << std::endl;
 			this->printOut();
+			this->envTable->printOut();
 			std::cout << "Intermediate Code Generation Complete!" << std::endl;
 			return;
 		}
@@ -187,6 +188,7 @@ void SyntaxAnalysis::printOut()
 		*outf << i++ << ": " << it->code << std::endl;
 	}
 	*outf << "```" << std::endl;
+	*outf << std::endl;
 }
 
 void SyntaxAnalysis::ept()

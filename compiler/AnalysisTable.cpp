@@ -411,4 +411,5 @@ void AnalysisTable::printToFile()
 	}
 
 	*outf << "</table>" << std::endl;
+	*outf << std::endl;
 }

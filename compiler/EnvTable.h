@@ -17,6 +17,7 @@ public:
 		}
 	};
 	EnvTable();
+	EnvTable(std::ofstream*);
 	~EnvTable();
 	// 添加表项
 	void createItem(std::pair<int, std::string>);
@@ -29,7 +30,10 @@ public:
 	int getOffset();
 	// 声明语句enter
 	bool enter(std::pair<int,std::string>,std::string,int);
+	// 打印表格
+	void printOut();
 private:
 	int offset = 0;
+	std::ofstream* outf;
 };
 

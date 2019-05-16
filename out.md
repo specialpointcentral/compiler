@@ -38,7 +38,6 @@
 < 3 , b >
 < 4 , ; >
 ```
------Lex result END-----
 
 ### Grammar Analysis
 #### First Table
@@ -2460,6 +2459,7 @@
 <td> </td>
 </tr>
 </table>
+
 ### Intermediate Code Generation
 ```
 0: a = 2
@@ -2472,3 +2472,13 @@
 7: t = a - b
 8: c = t
 ```
+
+### Env table
+| Item | size | addr | kind | type | value |
+| --- | --- | --- | --- | --- | --- |
+| < 2 , 1 > | 0 | 0 | 3 |  | 1 |
+| < 2 , 2 > | 0 | 0 | 3 |  | 2 |
+| < 3 , a > | 4 | 0 | 1 | int |  |
+| < 3 , b > | 4 | 4 | 1 | int |  |
+| < 3 , c > | 4 | 8 | 1 | int |  |
+

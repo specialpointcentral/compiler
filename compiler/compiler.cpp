@@ -15,7 +15,7 @@ TokenList tokenList;
 AnalysisTable analysisTable = AnalysisTable();
 std::vector<std::pair<std::pair<int, std::string>, std::vector<std::pair<int, std::string>>>> gramRule;
 std::map<int, std::string> actionList;
-EnvTable envTable;
+EnvTable envTable(&outf);
 
 void spiltArray(const string&, vector<string>&, const string&);
 std::pair<int, std::string> getPair(const std::string&);
@@ -31,17 +31,22 @@ int main()
 	if (!inf.is_open()) {
 		cout << "Unable to open the input file. " << endl;
 		cout << "Press any key to continue.." << endl;
+		std::system("pause");
 		return 0;
 	}
 	cout << "Open gram file:";
 	cin >> filename;
-	readGram(filename, gramRule);
-	cout << "Output file:";
+	if (!readGram(filename, gramRule)) {
+		std::system("pause");
+		return 0;
+	}
+	cout << "Output file（use Markdown, *.md）:";
 	cin >> filename;
 	outf.open(filename, ios::out);
 	if (!outf.is_open()) {
 		cout << "Unable to open the output file. " << endl;
 		cout << "Press any key to continue.." << endl;
+		std::system("pause");
 		return 0;
 	}
 
@@ -78,6 +83,7 @@ int main()
 			std::cout << std::endl;
 		}
 		std::cout << "Analysis Stoped! Please check the code again!";
+		std::system("pause");
 		return 0;
 	}
 	std::vector<std::pair<int, std::string>> tokenLists;
@@ -87,7 +93,7 @@ int main()
 	for (auto it = tokenLists.begin(); it != tokenLists.end(); ++it) {
 		outf << "< " << it->first << " , " << it->second << " >" << std::endl;
 	}
-	outf << "```" << std::endl << "-----Lex result END-----" << std::endl << std::endl;
+	outf << "```" << std::endl << std::endl;
 	// 生成状态转换表
 	analysisTable.setRealGram(gramRule, &outf);
 	analysisTable.insertTable();
@@ -99,6 +105,7 @@ int main()
 	// 进行语法制导的语义翻译
 	gram.beginAnalysis();
 
+	std::system("pause");
 	return 0;
 }
 
